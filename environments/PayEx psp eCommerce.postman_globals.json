@@ -1,0 +1,124 @@
+{
+	"id": "cf5e793d-433b-4b72-8cd7-f1e96cc1d087",
+	"values": [
+		{
+			"key": "description",
+			"value": "test description",
+			"enabled": true
+		},
+		{
+			"key": "payeeReference",
+			"value": "someUniqueReference{{$timestamp}}",
+			"enabled": true
+		},
+		{
+			"key": "hostUrl",
+			"value": "https://en.wikipedia.org/wiki/Host",
+			"enabled": true
+		},
+		{
+			"key": "completeUrl",
+			"value": "https://en.wikipedia.org/wiki/Success",
+			"enabled": true
+		},
+		{
+			"key": "cancelUrl",
+			"value": "https://en.wikipedia.org/wiki/Cancel",
+			"enabled": true
+		},
+		{
+			"key": "callbackUrl",
+			"value": "https://en.wikipedia.org/wiki/callback",
+			"enabled": true
+		},
+		{
+			"key": "ToSUrl",
+			"value": "https://en.wikipedia.org/wiki/Terms_of_service",
+			"enabled": true
+		},
+		{
+			"key": "logoUrl",
+			"value": "https://design.swedbankpay.com/v/4.5.0/img/swedbankpay-logo.svg",
+			"enabled": true
+		},
+		{
+			"key": "paymentUrl",
+			"value": "https://en.wikipedia.org/payment",
+			"enabled": true
+		},
+		{
+			"key": "cardPan",
+			"value": "4925000000000004",
+			"enabled": true
+		},
+		{
+			"key": "cardExpiryYear",
+			"value": "22",
+			"enabled": true
+		},
+		{
+			"key": "cardExpiryMonth",
+			"value": "12",
+			"enabled": true
+		},
+		{
+			"key": "cardCvc",
+			"value": "123",
+			"enabled": true
+		},
+		{
+			"key": "chosenCoBrand",
+			"value": "visa",
+			"enabled": true
+		},
+		{
+			"key": "operationAbortPayment",
+			"value": "Automatically updated",
+			"enabled": true
+		},
+		{
+			"key": "operationDirectPayment",
+			"value": "Automatically updated",
+			"enabled": true
+		},
+		{
+			"key": "operationRedirectPayment",
+			"value": "Automatically updated",
+			"enabled": true
+		},
+		{
+			"key": "operationSeamlessPayment",
+			"value": "Automatically updated",
+			"enabled": true
+		},
+		{
+			"key": "operationcancelPayment",
+			"value": "Automatically updated",
+			"enabled": true
+		},
+		{
+			"key": "operationcapturePayment",
+			"value": "Automatically updated",
+			"enabled": true
+		},
+		{
+			"key": "operationreversePayment",
+			"value": "Automatically updated",
+			"enabled": true
+		},
+		{
+			"key": "operationPaidPayment",
+			"value": "Automatically updated",
+			"enabled": true
+		},
+		{
+			"key": "operationApproveLegalAddress",
+			"value": "Automatically updated",
+			"enabled": true
+		}
+	],
+	"name": "PayEx psp eCommerce Globals",
+	"_postman_variable_scope": "globals",
+	"_postman_exported_at": "2020-05-22T13:04:30.619Z",
+	"_postman_exported_using": "Postman/7.24.0"
+}
