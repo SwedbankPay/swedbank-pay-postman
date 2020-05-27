@@ -117,8 +117,8 @@
 			"enabled": true
 		}
 	],
-	"name": "PayEx psp eCommerce Globals",
+	"name": "SwedbankPay eCommerce Globals",
 	"_postman_variable_scope": "globals",
-	"_postman_exported_at": "2020-05-22T13:04:30.619Z",
-	"_postman_exported_using": "Postman/7.24.0"
+	"_postman_exported_at": "2020-05-27T12:55:36.781Z",
+	"_postman_exported_using": "Postman/7.25.0"
 }
