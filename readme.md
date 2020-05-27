@@ -1,4 +1,6 @@
-# SwedbankPay.psp.eCommerce.Postman
+# Swedbank Pay Postman
+
+This repository contains a Postman collection and environments for Swedbank Pay's API Platform.
 
 ## Quick start
 
