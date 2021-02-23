@@ -9,76 +9,52 @@
 			"name": "checkout",
 			"item": [
 				{
-					"name": "Create paymentOrder",
-					"event": [
+					"name": "regular paymentOrder End to End",
+					"item": [
 						{
-							"listen": "test",
-							"script": {
-								"id": "380b8a83-3ca3-42bf-aebf-fd96d551c5a5",
-								"exec": [
-									"responseCode = pm.response.code;\r",
-									"responseBody = pm.response.json();\r",
-									"\r",
-									"if (responseCode >= 200 && responseCode < 300) {\r",
-									"    // Finding the values to set to globals\r",
-									"    const paymentId = responseBody.paymentOrder.id;\r",
-									"    const operations = responseBody.operations;\r",
-									"    const redirectPayment = operations.find(operations => operations.rel.startsWith(\"redirect-\"));\r",
-									"    const seamlessPayment = operations.find(operations => operations.rel === \"view-paymenOrder\");\r",
-									"    const abortPayment = operations.find(operations => operations.rel.includes(\"abort\"));\r",
-									"    // Use data to populate immediately relevant data to continue flow.\r",
-									"    pm.environment.set(\"paymentId\", paymentId);                                                 // These will only be set if the operation is found\r",
-									"    pm.globals.set(\"operationRedirectPayment\", redirectPayment ? redirectPayment.href : \"N/A\"); // This is to avoid using data of wrong payment\r",
-									"    pm.globals.set(\"operationSeamlessPayment\", seamlessPayment ? seamlessPayment.href : \"N/A\"); // Furthermore you will get an error \r",
-									"    pm.globals.set(\"operationAbortPayment\", abortPayment ? abortPayment.href : \"N/A\");          // when trying to use N/A data.\r",
-									"}"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
+							"name": "Create paymentOrder",
+							"event": [
 								{
-									"key": "token",
-									"value": "{{merchantToken}}",
-									"type": "string"
+									"listen": "test",
+									"script": {
+										"exec": [
+											"responseCode = pm.response.code;\r",
+											"responseBody = pm.response.json();\r",
+											"\r",
+											"if (responseCode >= 200 && responseCode < 300) {\r",
+											"    // Finding the values to set to globals\r",
+											"    const paymentId = responseBody.paymentOrder.id;\r",
+											"    const operations = responseBody.operations;\r",
+											"    const redirectPayment = operations.find(operations => operations.rel.startsWith(\"redirect-\"));\r",
+											"    const seamlessPayment = operations.find(operations => operations.rel === \"view-paymenOrder\");\r",
+											"    const abortPayment = operations.find(operations => operations.rel.includes(\"abort\"));\r",
+											"    // Use data to populate immediately relevant data to continue flow.\r",
+											"    pm.environment.set(\"paymentId\", paymentId);                                                 // These will only be set if the operation is found\r",
+											"    pm.globals.set(\"operationRedirectPayment\", redirectPayment ? redirectPayment.href : \"N/A\"); // This is to avoid using data of wrong payment\r",
+											"    pm.globals.set(\"operationSeamlessPayment\", seamlessPayment ? seamlessPayment.href : \"N/A\"); // Furthermore you will get an error \r",
+											"    pm.globals.set(\"operationAbortPayment\", abortPayment ? abortPayment.href : \"N/A\");          // when trying to use N/A data.\r",
+											"}"
+										],
+										"type": "text/javascript"
+									}
 								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"paymentorder\": {\n        \"operation\": \"Purchase\",\n        \"amount\": 15000,\n        \"vatAmount\": 0,\n        \"currency\": \"{{currency}}\",\n        \"description\": \"{{description}}\",\n        \"language\": \"{{language}}\",\n        \"userAgent\": \"Mozilla/5.0\",\n        \"disablePaymentMenu\": false,\n        \"orderItems\": [\n            {\n                \"reference\": \"P1\",\n                \"name\": \"Product1\",\n                \"type\": \"PRODUCT\",\n                \"class\": \"ProductGroup1\",\n                \"itemUrl\": \"https://www.demoshop.com/shop/id=666\",\n                \"imageUrl\": \"https://www.demoshop.com/product1.jpg\",\n                \"description\": \"Product 1 description\",\n                \"discountDescription\": \"Volume discount\",\n                \"quantity\": 2,\n                \"quantityUnit\": \"pcs\",\n                \"unitPrice\": 2500,\n                \"discountPrice\": 0,\n                \"vatPercent\": 0,\n                \"amount\": 5000,\n                \"vatAmount\": 0\n            },\n            {\n                \"reference\": \"P2\",\n                \"name\": \"Product2\",\n                \"type\": \"PRODUCT\",\n                \"class\": \"ProductGroup1\",\n                \"description\": \"Product 2 description\",\n                \"quantity\": 5.00,\n                \"quantityUnit\": \"kg\",\n                \"unitPrice\": 1000,\n                \"vatPercent\": 0,\n                \"amount\": 5000,\n                \"vatAmount\": 0\n            },\n            {\n                \"reference\": \"P2\",\n                \"name\": \"Product2\",\n                \"type\": \"PRODUCT\",\n                \"class\": \"ProductGroup1\",\n                \"description\": \"Product 2 description\",\n                \"quantity\": 5.00,\n                \"quantityUnit\": \"kg\",\n                \"unitPrice\": 1000,\n                \"vatPercent\": 0,\n                \"amount\": 5000,\n                \"vatAmount\": 0\n            }\n        ],\n        \"urls\": {\n            \"hostUrls\": [\n                \"{{hostUrl}}\"\n            ],\n            \"completeUrl\": \"{{completeUrl}}\",\n            \"cancelUrl\": \"{{cancelUrl}}\",\n            \"callbackUrl\": \"{{callbackUrl}}\",\n            \"termsOfServiceUrl\": \"{{ToSUrl}}\",\n            \"logoUrl\": \"{{logoUrl}}\"\n        },\n        \"payeeInfo\": {\n            \"payeeId\": \"{{merchantId}}\",\n            \"payeeReference\": \"{{payeeReference}}\",\n            \"payeeName\": \"{{merchantName}}\"\n        }\n    }\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/psp/paymentorders",
-							"host": [
-								"{{baseUrl}}"
 							],
-							"path": [
-								"psp",
-								"paymentorders"
-							]
-						}
-					},
-					"response": [
-						{
-							"name": "Regular paymentOrder",
-							"originalRequest": {
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{merchantToken}}",
+											"type": "string"
+										}
+									]
+								},
 								"method": "POST",
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"paymentorder\": {\n        \"operation\": \"Purchase\",\n        \"amount\": 10000,\n        \"vatAmount\": 0,\n        \"currency\": \"SEK\",\n        \"description\": \"test description\",\n        \"language\": \"sv-SE\",\n        \"userAgent\": \"Mozilla/5.0\",\n        \"disablePaymentMenu\": false,\n        \"orderItems\": [\n            {\n                \"reference\": \"P1\",\n                \"name\": \"Product1\",\n                \"type\": \"PRODUCT\",\n                \"class\": \"ProductGroup1\",\n                \"itemUrl\": \"https://www.demoshop.com/shop/id=666\",\n                \"imageUrl\": \"https://www.demoshop.com/product1.jpg\",\n                \"description\": \"Product 1 description\",\n                \"discountDescription\": \"Volume discount\",\n                \"quantity\": 2,\n                \"quantityUnit\": \"pcs\",\n                \"unitPrice\": 2500,\n                \"discountPrice\": 0,\n                \"vatPercent\": 0,\n                \"amount\": 5000,\n                \"vatAmount\": 0\n            },\n            {\n                \"reference\": \"P2\",\n                \"name\": \"Product2\",\n                \"type\": \"PRODUCT\",\n                \"class\": \"ProductGroup1\",\n                \"description\": \"Product 2 description\",\n                \"quantity\": 5.00,\n                \"quantityUnit\": \"kg\",\n                \"unitPrice\": 1000,\n                \"vatPercent\": 0,\n                \"amount\": 5000,\n                \"vatAmount\": 0\n            }\n        ],\n        \"urls\": {\n        \t\"hostUrls\": [\n        \t\t\"https://en.wikipedia.org/wiki/Host\"\n    \t\t],\n            \"completeUrl\": \"https://en.wikipedia.org/wiki/Success\",\n            \"cancelUrl\": \"https://en.wikipedia.org/wiki/Cancel\",\n            \"callbackUrl\": \"https://en.wikipedia.org/wiki/Callback\",\n            \"termsOfServiceUrl\": \"https://en.wikipedia.org/wiki/Terms_Of_Service\",\n            \"logoUrl\": \"https://design.swedbankpay.com/v/4.5.0/img/swedbankpay-logo.svg\"\n        },\n        \"payeeInfo\": {\n            \"payeeId\": \"734310b0-f9b5-48ea-b730-b3628d907f0c\",\n            \"payeeReference\": \"someUniquereference123897\",\n            \"payeeName\": \"test merchant\"\n        }\n    }\n}",
+									"raw": "{\n    \"paymentorder\": {\n        \"operation\": \"Purchase\",\n        \"amount\": 15000,\n        \"vatAmount\": 0,\n        \"currency\": \"{{currency}}\",\n        \"description\": \"{{description}}\",\n        \"language\": \"{{language}}\",\n        \"userAgent\": \"Mozilla/5.0\",\n        \"disablePaymentMenu\": false,\n        \"orderItems\": [\n            {\n                \"reference\": \"P1\",\n                \"name\": \"Product1\",\n                \"type\": \"PRODUCT\",\n                \"class\": \"ProductGroup1\",\n                \"itemUrl\": \"https://www.demoshop.com/shop/id=666\",\n                \"imageUrl\": \"https://www.demoshop.com/product1.jpg\",\n                \"description\": \"Product 1 description\",\n                \"discountDescription\": \"Volume discount\",\n                \"quantity\": 2,\n                \"quantityUnit\": \"pcs\",\n                \"unitPrice\": 2500,\n                \"discountPrice\": 0,\n                \"vatPercent\": 0,\n                \"amount\": 5000,\n                \"vatAmount\": 0\n            },\n            {\n                \"reference\": \"P2\",\n                \"name\": \"Product2\",\n                \"type\": \"PRODUCT\",\n                \"class\": \"ProductGroup1\",\n                \"description\": \"Product 2 description\",\n                \"quantity\": 5.00,\n                \"quantityUnit\": \"kg\",\n                \"unitPrice\": 1000,\n                \"vatPercent\": 0,\n                \"amount\": 5000,\n                \"vatAmount\": 0\n            },\n            {\n                \"reference\": \"P2\",\n                \"name\": \"Product2\",\n                \"type\": \"PRODUCT\",\n                \"class\": \"ProductGroup1\",\n                \"description\": \"Product 2 description\",\n                \"quantity\": 5.00,\n                \"quantityUnit\": \"kg\",\n                \"unitPrice\": 1000,\n                \"vatPercent\": 0,\n                \"amount\": 5000,\n                \"vatAmount\": 0\n            }\n        ],\n        \"urls\": {\n            \"hostUrls\": [\n                \"{{hostUrl}}\"\n            ],\n            \"completeUrl\": \"{{completeUrl}}\",\n            \"cancelUrl\": \"{{cancelUrl}}\",\n            \"callbackUrl\": \"{{callbackUrl}}\",\n            \"termsOfServiceUrl\": \"{{ToSUrl}}\",\n            \"logoUrl\": \"{{logoUrl}}\"\n        },\n        \"payeeInfo\": {\n            \"payeeId\": \"{{merchantId}}\",\n            \"payeeReference\": \"{{payeeReference}}\",\n            \"payeeName\": \"{{merchantName}}\"\n        }\n    }\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -96,126 +72,127 @@
 									]
 								}
 							},
-							"status": "Created",
-							"code": 201,
-							"_postman_previewlanguage": "json",
-							"header": [
+							"response": [
 								{
-									"key": "Content-Type",
-									"value": "application/json; charset=utf-8"
-								},
-								{
-									"key": "Location",
-									"value": "http://api.externalintegration.payex.com/psp/paymentorders/44b5c314-e90e-4d09-adec-08d7fcb6ccea"
-								},
-								{
-									"key": "Server",
-									"value": "Microsoft-IIS/8.5"
-								},
-								{
-									"key": "X-Powered-By",
-									"value": "ASP.NET"
-								},
-								{
-									"key": "Date",
-									"value": "Fri, 22 May 2020 11:53:57 GMT"
-								},
-								{
-									"key": "Content-Length",
-									"value": "1850"
-								},
-								{
-									"key": "Strict-Transport-Security",
-									"value": "max-age=16070400; includeSubDomains"
-								}
-							],
-							"cookie": [],
-							"body": "{\n    \"paymentOrder\": {\n        \"id\": \"/psp/paymentorders/44b5c314-e90e-4d09-adec-08d7fcb6ccea\",\n        \"created\": \"2020-05-22T11:53:57.7510564Z\",\n        \"updated\": \"2020-05-22T11:53:58.0206452Z\",\n        \"operation\": \"Purchase\",\n        \"state\": \"Ready\",\n        \"currency\": \"SEK\",\n        \"amount\": 10000,\n        \"vatAmount\": 0,\n        \"orderItems\": {\n            \"id\": \"/psp/paymentorders/44b5c314-e90e-4d09-adec-08d7fcb6ccea/orderitems\"\n        },\n        \"description\": \"test description\",\n        \"initiatingSystemUserAgent\": \"Mozilla/5.0\",\n        \"userAgent\": \"Mozilla/5.0\",\n        \"language\": \"sv-SE\",\n        \"urls\": {\n            \"id\": \"/psp/paymentorders/44b5c314-e90e-4d09-adec-08d7fcb6ccea/urls\"\n        },\n        \"payeeInfo\": {\n            \"id\": \"/psp/paymentorders/44b5c314-e90e-4d09-adec-08d7fcb6ccea/payeeInfo\"\n        },\n        \"payments\": {\n            \"id\": \"/psp/paymentorders/44b5c314-e90e-4d09-adec-08d7fcb6ccea/payments\"\n        },\n        \"currentPayment\": {\n            \"id\": \"/psp/paymentorders/44b5c314-e90e-4d09-adec-08d7fcb6ccea/currentpayment\"\n        },\n        \"items\": [\n            {\n                \"creditCard\": {\n                    \"cardBrands\": [\n                        \"Visa\",\n                        \"MasterCard\",\n                        \"Amex\",\n                        \"Dankort\",\n                        \"Diners\",\n                        \"Finax\",\n                        \"Forbrugsforeningen\",\n                        \"Jcb\",\n                        \"IkanoFinansDk\",\n                        \"Lindex\",\n                        \"Maestro\",\n                        \"Ica\"\n                    ]\n                }\n            }\n        ]\n    },\n    \"operations\": [\n        {\n            \"method\": \"PATCH\",\n            \"href\": \"https://api.externalintegration.payex.com/psp/paymentorders/44b5c314-e90e-4d09-adec-08d7fcb6ccea\",\n            \"rel\": \"update-paymentorder-updateorder\",\n            \"contentType\": \"application/json\"\n        },\n        {\n            \"method\": \"PATCH\",\n            \"href\": \"https://api.externalintegration.payex.com/psp/paymentorders/44b5c314-e90e-4d09-adec-08d7fcb6ccea\",\n            \"rel\": \"update-paymentorder-abort\",\n            \"contentType\": \"application/json\"\n        },\n        {\n            \"method\": \"GET\",\n            \"href\": \"https://ecom.externalintegration.payex.com/paymentmenu/e0b696508f16431e6159d6b07118b6791d271d2e3d2cab3ab1845f530ff6e6f9\",\n            \"rel\": \"redirect-paymentorder\",\n            \"contentType\": \"text/html\"\n        },\n        {\n            \"method\": \"GET\",\n            \"href\": \"https://ecom.externalintegration.payex.com/paymentmenu/core/scripts/client/px.paymentmenu.client.js?token=e0b696508f16431e6159d6b07118b6791d271d2e3d2cab3ab1845f530ff6e6f9&culture=sv-SE\",\n            \"rel\": \"view-paymentorder\",\n            \"contentType\": \"application/javascript\"\n        }\n    ]\n}"
-						}
-					]
-				},
-				{
-					"name": "Get paymentOrder (verify authorization OK and proceed)",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "a501232b-a677-47b4-b737-b48503433e80",
-								"exec": [
-									"responseCode = pm.response.code;\r",
-									"responseBody = pm.response.json();\r",
-									"\r",
-									"if (responseCode >= 200 && responseCode < 300) {\r",
-									"    const operations = responseBody.operations;\r",
-									"    const redirectPayment = operations.find(operations => operations.rel.startsWith(\"redirect-\"));\r",
-									"    const seamlessPayment = operations.find(operations => operations.rel === \"view-paymenOrder\");\r",
-									"    const abortPayment = operations.find(operations => operations.rel.includes(\"abort\"));\r",
-									"    const capturePayment = operations.find(operations => operations.rel === \"create-paymentorder-capture\");\r",
-									"    const cancelPayment = operations.find(operations => operations.rel === \"create-paymentorder-cancel\");\r",
-									"    const reversePayment = operations.find(operations => operations.rel === \"create-paymentorder-reversal\");\r",
-									"    const paidPayment = operations.find(operations => operations.rel === \"paid-paymentOrder\");\r",
-									"    // Use data to populate immediately relevant data to continue flow.\r",
-									"    if (!paidPayment) {                                                                            // These will only be set if the operation is found\r",
-									"        pm.globals.set(\"operationRedirectPayment\", redirectPayment ? redirectPayment.href : \"N/A\"); // This is to avoid using data of wrong payment\r",
-									"        pm.globals.set(\"operationSeamlessPayment\", seamlessPayment ? seamlessPayment.href : \"N/A\"); // Furthermore you will get an error \r",
-									"        pm.globals.set(\"operationAbortPayment\", abortPayment ? abortPayment.href : \"N/A\");          // when trying to use N/A data.\r",
-									"    }\r",
-									"    else\r",
-									"        pm.globals.set(\"operationPaidPayment\", paidPayment.href);                                        // this one has already been confirmed exists when setting it here.\r",
-									"\r",
-									"    pm.globals.set(\"operationcapturePayment\", capturePayment ? capturePayment.href : \"N/A\");\r",
-									"    pm.globals.set(\"operationcancelPayment\", cancelPayment ? cancelPayment.href : \"N/A\");\r",
-									"    pm.globals.set(\"operationreversePayment\", reversePayment ? reversePayment.href : \"N/A\");\r",
-									"    const reversePaymentOrder = pm.variables.get(\"operationreversePayment\");\r",
-									"    reversePaymentOrder === \"N/A\" ? postman.setNextRequest(\"capture paymentOrder\") : postman.setNextRequest(\"reverse paymentOrder\");\r",
-									"}"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{merchantToken}}",
-									"type": "string"
+									"name": "Regular paymentOrder",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"paymentorder\": {\n        \"operation\": \"Purchase\",\n        \"amount\": 10000,\n        \"vatAmount\": 0,\n        \"currency\": \"SEK\",\n        \"description\": \"test description\",\n        \"language\": \"sv-SE\",\n        \"userAgent\": \"Mozilla/5.0\",\n        \"disablePaymentMenu\": false,\n        \"orderItems\": [\n            {\n                \"reference\": \"P1\",\n                \"name\": \"Product1\",\n                \"type\": \"PRODUCT\",\n                \"class\": \"ProductGroup1\",\n                \"itemUrl\": \"https://www.demoshop.com/shop/id=666\",\n                \"imageUrl\": \"https://www.demoshop.com/product1.jpg\",\n                \"description\": \"Product 1 description\",\n                \"discountDescription\": \"Volume discount\",\n                \"quantity\": 2,\n                \"quantityUnit\": \"pcs\",\n                \"unitPrice\": 2500,\n                \"discountPrice\": 0,\n                \"vatPercent\": 0,\n                \"amount\": 5000,\n                \"vatAmount\": 0\n            },\n            {\n                \"reference\": \"P2\",\n                \"name\": \"Product2\",\n                \"type\": \"PRODUCT\",\n                \"class\": \"ProductGroup1\",\n                \"description\": \"Product 2 description\",\n                \"quantity\": 5.00,\n                \"quantityUnit\": \"kg\",\n                \"unitPrice\": 1000,\n                \"vatPercent\": 0,\n                \"amount\": 5000,\n                \"vatAmount\": 0\n            }\n        ],\n        \"urls\": {\n        \t\"hostUrls\": [\n        \t\t\"https://en.wikipedia.org/wiki/Host\"\n    \t\t],\n            \"completeUrl\": \"https://en.wikipedia.org/wiki/Success\",\n            \"cancelUrl\": \"https://en.wikipedia.org/wiki/Cancel\",\n            \"callbackUrl\": \"https://en.wikipedia.org/wiki/Callback\",\n            \"termsOfServiceUrl\": \"https://en.wikipedia.org/wiki/Terms_Of_Service\",\n            \"logoUrl\": \"https://design.swedbankpay.com/v/4.5.0/img/swedbankpay-logo.svg\"\n        },\n        \"payeeInfo\": {\n            \"payeeId\": \"734310b0-f9b5-48ea-b730-b3628d907f0c\",\n            \"payeeReference\": \"someUniquereference123897\",\n            \"payeeName\": \"test merchant\"\n        }\n    }\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://api.externalintegration.payex.com/psp/paymentorders",
+											"protocol": "https",
+											"host": [
+												"api",
+												"externalintegration",
+												"payex",
+												"com"
+											],
+											"path": [
+												"psp",
+												"paymentorders"
+											]
+										}
+									},
+									"status": "Created",
+									"code": 201,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Location",
+											"value": "http://api.externalintegration.payex.com/psp/paymentorders/44b5c314-e90e-4d09-adec-08d7fcb6ccea"
+										},
+										{
+											"key": "Server",
+											"value": "Microsoft-IIS/8.5"
+										},
+										{
+											"key": "X-Powered-By",
+											"value": "ASP.NET"
+										},
+										{
+											"key": "Date",
+											"value": "Fri, 22 May 2020 11:53:57 GMT"
+										},
+										{
+											"key": "Content-Length",
+											"value": "1850"
+										},
+										{
+											"key": "Strict-Transport-Security",
+											"value": "max-age=16070400; includeSubDomains"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"paymentOrder\": {\n        \"id\": \"/psp/paymentorders/44b5c314-e90e-4d09-adec-08d7fcb6ccea\",\n        \"created\": \"2020-05-22T11:53:57.7510564Z\",\n        \"updated\": \"2020-05-22T11:53:58.0206452Z\",\n        \"operation\": \"Purchase\",\n        \"state\": \"Ready\",\n        \"currency\": \"SEK\",\n        \"amount\": 10000,\n        \"vatAmount\": 0,\n        \"orderItems\": {\n            \"id\": \"/psp/paymentorders/44b5c314-e90e-4d09-adec-08d7fcb6ccea/orderitems\"\n        },\n        \"description\": \"test description\",\n        \"initiatingSystemUserAgent\": \"Mozilla/5.0\",\n        \"userAgent\": \"Mozilla/5.0\",\n        \"language\": \"sv-SE\",\n        \"urls\": {\n            \"id\": \"/psp/paymentorders/44b5c314-e90e-4d09-adec-08d7fcb6ccea/urls\"\n        },\n        \"payeeInfo\": {\n            \"id\": \"/psp/paymentorders/44b5c314-e90e-4d09-adec-08d7fcb6ccea/payeeInfo\"\n        },\n        \"payments\": {\n            \"id\": \"/psp/paymentorders/44b5c314-e90e-4d09-adec-08d7fcb6ccea/payments\"\n        },\n        \"currentPayment\": {\n            \"id\": \"/psp/paymentorders/44b5c314-e90e-4d09-adec-08d7fcb6ccea/currentpayment\"\n        },\n        \"items\": [\n            {\n                \"creditCard\": {\n                    \"cardBrands\": [\n                        \"Visa\",\n                        \"MasterCard\",\n                        \"Amex\",\n                        \"Dankort\",\n                        \"Diners\",\n                        \"Finax\",\n                        \"Forbrugsforeningen\",\n                        \"Jcb\",\n                        \"IkanoFinansDk\",\n                        \"Lindex\",\n                        \"Maestro\",\n                        \"Ica\"\n                    ]\n                }\n            }\n        ]\n    },\n    \"operations\": [\n        {\n            \"method\": \"PATCH\",\n            \"href\": \"https://api.externalintegration.payex.com/psp/paymentorders/44b5c314-e90e-4d09-adec-08d7fcb6ccea\",\n            \"rel\": \"update-paymentorder-updateorder\",\n            \"contentType\": \"application/json\"\n        },\n        {\n            \"method\": \"PATCH\",\n            \"href\": \"https://api.externalintegration.payex.com/psp/paymentorders/44b5c314-e90e-4d09-adec-08d7fcb6ccea\",\n            \"rel\": \"update-paymentorder-abort\",\n            \"contentType\": \"application/json\"\n        },\n        {\n            \"method\": \"GET\",\n            \"href\": \"https://ecom.externalintegration.payex.com/paymentmenu/e0b696508f16431e6159d6b07118b6791d271d2e3d2cab3ab1845f530ff6e6f9\",\n            \"rel\": \"redirect-paymentorder\",\n            \"contentType\": \"text/html\"\n        },\n        {\n            \"method\": \"GET\",\n            \"href\": \"https://ecom.externalintegration.payex.com/paymentmenu/core/scripts/client/px.paymentmenu.client.js?token=e0b696508f16431e6159d6b07118b6791d271d2e3d2cab3ab1845f530ff6e6f9&culture=sv-SE\",\n            \"rel\": \"view-paymentorder\",\n            \"contentType\": \"application/javascript\"\n        }\n    ]\n}"
 								}
 							]
 						},
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}{{paymentId}}?$expand=currentPayment",
-							"host": [
-								"{{baseUrl}}{{paymentId}}"
-							],
-							"query": [
-								{
-									"key": "$expand",
-									"value": "currentPayment"
-								}
-							]
-						}
-					},
-					"response": [
 						{
-							"name": "Get paymentOrder",
-							"originalRequest": {
+							"name": "Get paymentOrder (verify authorization OK and proceed)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"responseCode = pm.response.code;\r",
+											"responseBody = pm.response.json();\r",
+											"\r",
+											"if (responseCode >= 200 && responseCode < 300) {\r",
+											"    const operations = responseBody.operations;\r",
+											"    const redirectPayment = operations.find(operations => operations.rel.startsWith(\"redirect-\"));\r",
+											"    const seamlessPayment = operations.find(operations => operations.rel === \"view-paymenOrder\");\r",
+											"    const abortPayment = operations.find(operations => operations.rel.includes(\"abort\"));\r",
+											"    const capturePayment = operations.find(operations => operations.rel === \"create-paymentorder-capture\");\r",
+											"    const cancelPayment = operations.find(operations => operations.rel === \"create-paymentorder-cancel\");\r",
+											"    const reversePayment = operations.find(operations => operations.rel === \"create-paymentorder-reversal\");\r",
+											"    const paidPayment = operations.find(operations => operations.rel === \"paid-paymentOrder\");\r",
+											"    // Use data to populate immediately relevant data to continue flow.\r",
+											"    if (!paidPayment) {                                                                            // These will only be set if the operation is found\r",
+											"        pm.globals.set(\"operationRedirectPayment\", redirectPayment ? redirectPayment.href : \"N/A\"); // This is to avoid using data of wrong payment\r",
+											"        pm.globals.set(\"operationSeamlessPayment\", seamlessPayment ? seamlessPayment.href : \"N/A\"); // Furthermore you will get an error \r",
+											"        pm.globals.set(\"operationAbortPayment\", abortPayment ? abortPayment.href : \"N/A\");          // when trying to use N/A data.\r",
+											"    }\r",
+											"    else\r",
+											"        pm.globals.set(\"operationPaidPayment\", paidPayment.href);                                        // this one has already been confirmed exists when setting it here.\r",
+											"\r",
+											"    pm.globals.set(\"operationcapturePayment\", capturePayment ? capturePayment.href : \"N/A\");\r",
+											"    pm.globals.set(\"operationcancelPayment\", cancelPayment ? cancelPayment.href : \"N/A\");\r",
+											"    pm.globals.set(\"operationreversePayment\", reversePayment ? reversePayment.href : \"N/A\");\r",
+											"    const reversePaymentOrder = pm.variables.get(\"operationreversePayment\");\r",
+											"    reversePaymentOrder === \"N/A\" ? postman.setNextRequest(\"capture paymentOrder\") : postman.setNextRequest(\"reverse paymentOrder\");\r",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{merchantToken}}",
+											"type": "string"
+										}
+									]
+								},
 								"method": "GET",
 								"header": [],
 								"body": {
@@ -228,95 +205,101 @@
 									}
 								},
 								"url": {
-									"raw": "https://api.externalintegration.payex.com/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3",
-									"protocol": "https",
+									"raw": "{{baseUrl}}{{paymentId}}?$expand=currentPayment",
 									"host": [
-										"api",
-										"externalintegration",
-										"payex",
-										"com"
+										"{{baseUrl}}{{paymentId}}"
 									],
-									"path": [
-										"psp",
-										"paymentorders",
-										"abcf1b37-6cf5-49a2-1392-08d7fe4a79b3"
+									"query": [
+										{
+											"key": "$expand",
+											"value": "currentPayment"
+										}
 									]
 								}
 							},
-							"status": "OK",
-							"code": 200,
-							"_postman_previewlanguage": "json",
-							"header": [
+							"response": [
 								{
-									"key": "Transfer-Encoding",
-									"value": "chunked"
-								},
-								{
-									"key": "Content-Type",
-									"value": "application/json; charset=utf-8"
-								},
-								{
-									"key": "Server",
-									"value": "Microsoft-IIS/8.5"
-								},
-								{
-									"key": "X-Powered-By",
-									"value": "ASP.NET"
-								},
-								{
-									"key": "Date",
-									"value": "Fri, 22 May 2020 12:21:21 GMT"
-								},
-								{
-									"key": "Strict-Transport-Security",
-									"value": "max-age=16070400; includeSubDomains"
-								}
-							],
-							"cookie": [],
-							"body": "{\n    \"paymentOrder\": {\n        \"id\": \"/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3\",\n        \"created\": \"2020-05-22T12:20:48.8045871Z\",\n        \"updated\": \"2020-05-22T12:21:07.2297997Z\",\n        \"operation\": \"Purchase\",\n        \"state\": \"Ready\",\n        \"currency\": \"SEK\",\n        \"amount\": 10000,\n        \"vatAmount\": 0,\n        \"remainingReversalAmount\": 10000,\n        \"orderItems\": {\n            \"id\": \"/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3/orderitems\"\n        },\n        \"description\": \"test description\",\n        \"initiatingSystemUserAgent\": \"Mozilla/5.0\",\n        \"userAgent\": \"Mozilla/5.0\",\n        \"language\": \"sv-SE\",\n        \"urls\": {\n            \"id\": \"/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3/urls\"\n        },\n        \"payeeInfo\": {\n            \"id\": \"/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3/payeeInfo\"\n        },\n        \"payments\": {\n            \"id\": \"/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3/payments\"\n        },\n        \"currentPayment\": {\n            \"id\": \"/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3/currentpayment\"\n        },\n        \"items\": [\n            {\n                \"creditCard\": {\n                    \"cardBrands\": [\n                        \"Visa\",\n                        \"MasterCard\",\n                        \"Amex\",\n                        \"Dankort\",\n                        \"Diners\",\n                        \"Finax\",\n                        \"Forbrugsforeningen\",\n                        \"Jcb\",\n                        \"IkanoFinansDk\",\n                        \"Lindex\",\n                        \"Maestro\",\n                        \"Ica\"\n                    ]\n                }\n            }\n        ]\n    },\n    \"operations\": [\n        {\n            \"method\": \"POST\",\n            \"href\": \"https://api.externalintegration.payex.com/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3/reversals\",\n            \"rel\": \"create-paymentorder-reversal\",\n            \"contentType\": \"application/json\"\n        },\n        {\n            \"method\": \"POST\",\n            \"href\": \"https://api.externalintegration.payex.com/psp/swish/payments/486721ed-2acb-4c2b-bb24-08d7fe4a9a27/reversals\",\n            \"rel\": \"create-reversal\"\n        },\n        {\n            \"method\": \"GET\",\n            \"href\": \"https://ecom.externalintegration.payex.com/swish/core/scripts/client/px.swish.client.js?token=f9e9782a59ba56bbc496ab85c6e2aacdd06a3a89acf89e2a89267b3b4b1eb07d&Culture=sv-SE\",\n            \"rel\": \"view-payment\",\n            \"contentType\": \"application/javascript\"\n        },\n        {\n            \"method\": \"GET\",\n            \"href\": \"https://api.externalintegration.payex.com/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3/paid\",\n            \"rel\": \"paid-paymentorder\",\n            \"contentType\": \"application/json\"\n        }\n    ]\n}"
-						}
-					]
-				},
-				{
-					"name": "capture paymentOrder",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{merchantToken}}",
-									"type": "string"
+									"name": "Get paymentOrder",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://api.externalintegration.payex.com/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3",
+											"protocol": "https",
+											"host": [
+												"api",
+												"externalintegration",
+												"payex",
+												"com"
+											],
+											"path": [
+												"psp",
+												"paymentorders",
+												"abcf1b37-6cf5-49a2-1392-08d7fe4a79b3"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Transfer-Encoding",
+											"value": "chunked"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Server",
+											"value": "Microsoft-IIS/8.5"
+										},
+										{
+											"key": "X-Powered-By",
+											"value": "ASP.NET"
+										},
+										{
+											"key": "Date",
+											"value": "Fri, 22 May 2020 12:21:21 GMT"
+										},
+										{
+											"key": "Strict-Transport-Security",
+											"value": "max-age=16070400; includeSubDomains"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"paymentOrder\": {\n        \"id\": \"/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3\",\n        \"created\": \"2020-05-22T12:20:48.8045871Z\",\n        \"updated\": \"2020-05-22T12:21:07.2297997Z\",\n        \"operation\": \"Purchase\",\n        \"state\": \"Ready\",\n        \"currency\": \"SEK\",\n        \"amount\": 10000,\n        \"vatAmount\": 0,\n        \"remainingReversalAmount\": 10000,\n        \"orderItems\": {\n            \"id\": \"/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3/orderitems\"\n        },\n        \"description\": \"test description\",\n        \"initiatingSystemUserAgent\": \"Mozilla/5.0\",\n        \"userAgent\": \"Mozilla/5.0\",\n        \"language\": \"sv-SE\",\n        \"urls\": {\n            \"id\": \"/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3/urls\"\n        },\n        \"payeeInfo\": {\n            \"id\": \"/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3/payeeInfo\"\n        },\n        \"payments\": {\n            \"id\": \"/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3/payments\"\n        },\n        \"currentPayment\": {\n            \"id\": \"/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3/currentpayment\"\n        },\n        \"items\": [\n            {\n                \"creditCard\": {\n                    \"cardBrands\": [\n                        \"Visa\",\n                        \"MasterCard\",\n                        \"Amex\",\n                        \"Dankort\",\n                        \"Diners\",\n                        \"Finax\",\n                        \"Forbrugsforeningen\",\n                        \"Jcb\",\n                        \"IkanoFinansDk\",\n                        \"Lindex\",\n                        \"Maestro\",\n                        \"Ica\"\n                    ]\n                }\n            }\n        ]\n    },\n    \"operations\": [\n        {\n            \"method\": \"POST\",\n            \"href\": \"https://api.externalintegration.payex.com/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3/reversals\",\n            \"rel\": \"create-paymentorder-reversal\",\n            \"contentType\": \"application/json\"\n        },\n        {\n            \"method\": \"POST\",\n            \"href\": \"https://api.externalintegration.payex.com/psp/swish/payments/486721ed-2acb-4c2b-bb24-08d7fe4a9a27/reversals\",\n            \"rel\": \"create-reversal\"\n        },\n        {\n            \"method\": \"GET\",\n            \"href\": \"https://ecom.externalintegration.payex.com/swish/core/scripts/client/px.swish.client.js?token=f9e9782a59ba56bbc496ab85c6e2aacdd06a3a89acf89e2a89267b3b4b1eb07d&Culture=sv-SE\",\n            \"rel\": \"view-payment\",\n            \"contentType\": \"application/javascript\"\n        },\n        {\n            \"method\": \"GET\",\n            \"href\": \"https://api.externalintegration.payex.com/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3/paid\",\n            \"rel\": \"paid-paymentorder\",\n            \"contentType\": \"application/json\"\n        }\n    ]\n}"
 								}
 							]
 						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"transaction\": {\n        \"amount\": 10000,\n        \"vatAmount\": 0,\n        \"bonusAmount\": 0,\n        \"payeeReference\": \"{{payeeReference}}\",\n        \"description\": \"description for transaction\",\n        \"orderItems\": [\n            {\n                \"reference\": \"P1\",\n                \"name\": \"Product1\",\n                \"type\": \"PRODUCT\",\n                \"class\": \"ProductGroup1\",\n                \"itemUrl\": \"https://www.demoshop.com/shop/id=666\",\n                \"imageUrl\": \"https://www.demoshop.com/product1.jpg\",\n                \"description\": \"Product 1 description\",\n                \"discountDescription\": \"Volume discount\",\n                \"quantity\": 2,\n                \"quantityUnit\": \"pcs\",\n                \"unitPrice\": 2500,\n                \"discountPrice\": 0,\n                \"vatPercent\": 0,\n                \"amount\": 5000,\n                \"vatAmount\": 0\n            },\n            {\n                \"reference\": \"P2\",\n                \"name\": \"Product2\",\n                \"type\": \"PRODUCT\",\n                \"class\": \"ProductGroup1\",\n                \"description\": \"Product 2 description\",\n                \"quantity\": 5.00,\n                \"quantityUnit\": \"kg\",\n                \"unitPrice\": 1000,\n                \"vatPercent\": 0,\n                \"amount\": 5000,\n                \"vatAmount\": 0\n            }\n        ]\n    }\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{operationcapturePayment}}",
-							"host": [
-								"{{operationcapturePayment}}"
-							]
-						}
-					},
-					"response": [
 						{
 							"name": "capture paymentOrder",
-							"originalRequest": {
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{merchantToken}}",
+											"type": "string"
+										}
+									]
+								},
 								"method": "POST",
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"transaction\": {\n        \"amount\": 10000,\n        \"vatAmount\": 0,\n        \"bonusAmount\": 0,\n        \"payeeReference\": \"someUniqueReference1590150186\",\n        \"description\": \"description for transaction\",\n        \"orderItems\": [\n            {\n                \"reference\": \"P1\",\n                \"name\": \"Product1\",\n                \"type\": \"PRODUCT\",\n                \"class\": \"ProductGroup1\",\n                \"itemUrl\": \"https://www.demoshop.com/shop/id=666\",\n                \"imageUrl\": \"https://www.demoshop.com/product1.jpg\",\n                \"description\": \"Product 1 description\",\n                \"discountDescription\": \"Volume discount\",\n                \"quantity\": 2,\n                \"quantityUnit\": \"pcs\",\n                \"unitPrice\": 2500,\n                \"discountPrice\": 0,\n                \"vatPercent\": 0,\n                \"amount\": 5000,\n                \"vatAmount\": 0\n            },\n            {\n                \"reference\": \"P2\",\n                \"name\": \"Product2\",\n                \"type\": \"PRODUCT\",\n                \"class\": \"ProductGroup1\",\n                \"description\": \"Product 2 description\",\n                \"quantity\": 5.00,\n                \"quantityUnit\": \"kg\",\n                \"unitPrice\": 1000,\n                \"vatPercent\": 0,\n                \"amount\": 5000,\n                \"vatAmount\": 0\n            }\n        ]\n    }\n}",
+									"raw": "{\n    \"transaction\": {\n        \"amount\": 10000,\n        \"vatAmount\": 0,\n        \"bonusAmount\": 0,\n        \"payeeReference\": \"{{payeeReference}}\",\n        \"description\": \"description for transaction\",\n        \"orderItems\": [\n            {\n                \"reference\": \"P1\",\n                \"name\": \"Product1\",\n                \"type\": \"PRODUCT\",\n                \"class\": \"ProductGroup1\",\n                \"itemUrl\": \"https://www.demoshop.com/shop/id=666\",\n                \"imageUrl\": \"https://www.demoshop.com/product1.jpg\",\n                \"description\": \"Product 1 description\",\n                \"discountDescription\": \"Volume discount\",\n                \"quantity\": 2,\n                \"quantityUnit\": \"pcs\",\n                \"unitPrice\": 2500,\n                \"discountPrice\": 0,\n                \"vatPercent\": 0,\n                \"amount\": 5000,\n                \"vatAmount\": 0\n            },\n            {\n                \"reference\": \"P2\",\n                \"name\": \"Product2\",\n                \"type\": \"PRODUCT\",\n                \"class\": \"ProductGroup1\",\n                \"description\": \"Product 2 description\",\n                \"quantity\": 5.00,\n                \"quantityUnit\": \"kg\",\n                \"unitPrice\": 1000,\n                \"vatPercent\": 0,\n                \"amount\": 5000,\n                \"vatAmount\": 0\n            }\n        ]\n    }\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -324,136 +307,129 @@
 									}
 								},
 								"url": {
-									"raw": "https://api.externalintegration.payex.com/psp/paymentorders/562482e8-06fb-432d-13a7-08d7fe4a79b3/captures",
-									"protocol": "https",
+									"raw": "{{operationcapturePayment}}",
 									"host": [
-										"api",
-										"externalintegration",
-										"payex",
-										"com"
-									],
-									"path": [
-										"psp",
-										"paymentorders",
-										"562482e8-06fb-432d-13a7-08d7fe4a79b3",
-										"captures"
+										"{{operationcapturePayment}}"
 									]
 								}
 							},
-							"status": "OK",
-							"code": 200,
-							"_postman_previewlanguage": "json",
-							"header": [
+							"response": [
 								{
-									"key": "Content-Type",
-									"value": "application/json; charset=utf-8"
-								},
-								{
-									"key": "Server",
-									"value": "Microsoft-IIS/8.5"
-								},
-								{
-									"key": "X-Powered-By",
-									"value": "ASP.NET"
-								},
-								{
-									"key": "Date",
-									"value": "Fri, 22 May 2020 12:23:07 GMT"
-								},
-								{
-									"key": "Content-Length",
-									"value": "637"
-								},
-								{
-									"key": "Strict-Transport-Security",
-									"value": "max-age=16070400; includeSubDomains"
-								}
-							],
-							"cookie": [],
-							"body": "{\n    \"payment\": \"/psp/creditcard/payments/120da28e-86fb-4ef0-0a50-08d7fe4a78cb\",\n    \"capture\": {\n        \"id\": \"/psp/creditcard/payments/120da28e-86fb-4ef0-0a50-08d7fe4a78cb/captures/4ea87d93-bd93-4cd4-9f1e-08d7fe4a5f78\",\n        \"transaction\": {\n            \"id\": \"/psp/creditcard/payments/120da28e-86fb-4ef0-0a50-08d7fe4a78cb/transactions/4ea87d93-bd93-4cd4-9f1e-08d7fe4a5f78\",\n            \"created\": \"2020-05-22T12:23:07.4823169Z\",\n            \"updated\": \"2020-05-22T12:23:07.5262582Z\",\n            \"type\": \"Capture\",\n            \"state\": \"Completed\",\n            \"number\": 40101653434,\n            \"amount\": 10000,\n            \"vatAmount\": 0,\n            \"description\": \"description for transaction\",\n            \"payeeReference\": \"someUniqueReference1590150186\",\n            \"isOperational\": false,\n            \"operations\": []\n        }\n    }\n}"
-						}
-					]
-				},
-				{
-					"name": "Get paymentOrder (verify capture OK and proceed)",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "1685153c-bba3-48be-ac34-ac00bd1d8af3",
-								"exec": [
-									"responseCode = pm.response.code;\r",
-									"responseBody = pm.response.json();\r",
-									"\r",
-									"if (responseCode >= 200 && responseCode < 300) {\r",
-									"    const operations = responseBody.operations;\r",
-									"    const redirectPayment = operations.find(operations => operations.rel.startsWith(\"redirect-\"));\r",
-									"    const seamlessPayment = operations.find(operations => operations.rel === \"view-paymenOrder\");\r",
-									"    const abortPayment = operations.find(operations => operations.rel.includes(\"abort\"));\r",
-									"    const capturePayment = operations.find(operations => operations.rel === \"create-paymentorder-capture\");\r",
-									"    const cancelPayment = operations.find(operations => operations.rel === \"create-paymentorder-cancel\");\r",
-									"    const reversePayment = operations.find(operations => operations.rel === \"create-paymentorder-reversal\");\r",
-									"    const paidPayment = operations.find(operations => operations.rel === \"paid-paymentOrder\");\r",
-									"    // Use data to populate immediately relevant data to continue flow.\r",
-									"    if (!paidPayment) {                                                                            // These will only be set if the operation is found\r",
-									"        pm.globals.set(\"operationRedirectPayment\", redirectPayment ? redirectPayment.href : \"N/A\"); // This is to avoid using data of wrong payment\r",
-									"        pm.globals.set(\"operationSeamlessPayment\", seamlessPayment ? seamlessPayment.href : \"N/A\"); // Furthermore you will get an error \r",
-									"        pm.globals.set(\"operationAbortPayment\", abortPayment ? abortPayment.href : \"N/A\");          // when trying to use N/A data.\r",
-									"    }\r",
-									"    else\r",
-									"        pm.globals.set(\"operationPaidPayment\", paidPayment.href);                                        // this one has already been confirmed exists when setting it here.\r",
-									"\r",
-									"    pm.globals.set(\"operationcapturePayment\", capturePayment ? capturePayment.href : \"N/A\");\r",
-									"    pm.globals.set(\"operationcancelPayment\", cancelPayment ? cancelPayment.href : \"N/A\");\r",
-									"    pm.globals.set(\"operationreversePayment\", reversePayment ? reversePayment.href : \"N/A\");\r",
-									"}"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{merchantToken}}",
-									"type": "string"
+									"name": "capture paymentOrder",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"transaction\": {\n        \"amount\": 10000,\n        \"vatAmount\": 0,\n        \"bonusAmount\": 0,\n        \"payeeReference\": \"someUniqueReference1590150186\",\n        \"description\": \"description for transaction\",\n        \"orderItems\": [\n            {\n                \"reference\": \"P1\",\n                \"name\": \"Product1\",\n                \"type\": \"PRODUCT\",\n                \"class\": \"ProductGroup1\",\n                \"itemUrl\": \"https://www.demoshop.com/shop/id=666\",\n                \"imageUrl\": \"https://www.demoshop.com/product1.jpg\",\n                \"description\": \"Product 1 description\",\n                \"discountDescription\": \"Volume discount\",\n                \"quantity\": 2,\n                \"quantityUnit\": \"pcs\",\n                \"unitPrice\": 2500,\n                \"discountPrice\": 0,\n                \"vatPercent\": 0,\n                \"amount\": 5000,\n                \"vatAmount\": 0\n            },\n            {\n                \"reference\": \"P2\",\n                \"name\": \"Product2\",\n                \"type\": \"PRODUCT\",\n                \"class\": \"ProductGroup1\",\n                \"description\": \"Product 2 description\",\n                \"quantity\": 5.00,\n                \"quantityUnit\": \"kg\",\n                \"unitPrice\": 1000,\n                \"vatPercent\": 0,\n                \"amount\": 5000,\n                \"vatAmount\": 0\n            }\n        ]\n    }\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://api.externalintegration.payex.com/psp/paymentorders/562482e8-06fb-432d-13a7-08d7fe4a79b3/captures",
+											"protocol": "https",
+											"host": [
+												"api",
+												"externalintegration",
+												"payex",
+												"com"
+											],
+											"path": [
+												"psp",
+												"paymentorders",
+												"562482e8-06fb-432d-13a7-08d7fe4a79b3",
+												"captures"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Server",
+											"value": "Microsoft-IIS/8.5"
+										},
+										{
+											"key": "X-Powered-By",
+											"value": "ASP.NET"
+										},
+										{
+											"key": "Date",
+											"value": "Fri, 22 May 2020 12:23:07 GMT"
+										},
+										{
+											"key": "Content-Length",
+											"value": "637"
+										},
+										{
+											"key": "Strict-Transport-Security",
+											"value": "max-age=16070400; includeSubDomains"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"payment\": \"/psp/creditcard/payments/120da28e-86fb-4ef0-0a50-08d7fe4a78cb\",\n    \"capture\": {\n        \"id\": \"/psp/creditcard/payments/120da28e-86fb-4ef0-0a50-08d7fe4a78cb/captures/4ea87d93-bd93-4cd4-9f1e-08d7fe4a5f78\",\n        \"transaction\": {\n            \"id\": \"/psp/creditcard/payments/120da28e-86fb-4ef0-0a50-08d7fe4a78cb/transactions/4ea87d93-bd93-4cd4-9f1e-08d7fe4a5f78\",\n            \"created\": \"2020-05-22T12:23:07.4823169Z\",\n            \"updated\": \"2020-05-22T12:23:07.5262582Z\",\n            \"type\": \"Capture\",\n            \"state\": \"Completed\",\n            \"number\": 40101653434,\n            \"amount\": 10000,\n            \"vatAmount\": 0,\n            \"description\": \"description for transaction\",\n            \"payeeReference\": \"someUniqueReference1590150186\",\n            \"isOperational\": false,\n            \"operations\": []\n        }\n    }\n}"
 								}
 							]
 						},
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}{{paymentId}}?$expand=currentPayment",
-							"host": [
-								"{{baseUrl}}{{paymentId}}"
-							],
-							"query": [
-								{
-									"key": "$expand",
-									"value": "currentPayment"
-								}
-							]
-						}
-					},
-					"response": [
 						{
-							"name": "Get paymentOrder",
-							"originalRequest": {
+							"name": "Get paymentOrder (verify capture OK and proceed)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"responseCode = pm.response.code;\r",
+											"responseBody = pm.response.json();\r",
+											"\r",
+											"if (responseCode >= 200 && responseCode < 300) {\r",
+											"    const operations = responseBody.operations;\r",
+											"    const redirectPayment = operations.find(operations => operations.rel.startsWith(\"redirect-\"));\r",
+											"    const seamlessPayment = operations.find(operations => operations.rel === \"view-paymenOrder\");\r",
+											"    const abortPayment = operations.find(operations => operations.rel.includes(\"abort\"));\r",
+											"    const capturePayment = operations.find(operations => operations.rel === \"create-paymentorder-capture\");\r",
+											"    const cancelPayment = operations.find(operations => operations.rel === \"create-paymentorder-cancel\");\r",
+											"    const reversePayment = operations.find(operations => operations.rel === \"create-paymentorder-reversal\");\r",
+											"    const paidPayment = operations.find(operations => operations.rel === \"paid-paymentOrder\");\r",
+											"    // Use data to populate immediately relevant data to continue flow.\r",
+											"    if (!paidPayment) {                                                                            // These will only be set if the operation is found\r",
+											"        pm.globals.set(\"operationRedirectPayment\", redirectPayment ? redirectPayment.href : \"N/A\"); // This is to avoid using data of wrong payment\r",
+											"        pm.globals.set(\"operationSeamlessPayment\", seamlessPayment ? seamlessPayment.href : \"N/A\"); // Furthermore you will get an error \r",
+											"        pm.globals.set(\"operationAbortPayment\", abortPayment ? abortPayment.href : \"N/A\");          // when trying to use N/A data.\r",
+											"    }\r",
+											"    else\r",
+											"        pm.globals.set(\"operationPaidPayment\", paidPayment.href);                                        // this one has already been confirmed exists when setting it here.\r",
+											"\r",
+											"    pm.globals.set(\"operationcapturePayment\", capturePayment ? capturePayment.href : \"N/A\");\r",
+											"    pm.globals.set(\"operationcancelPayment\", cancelPayment ? cancelPayment.href : \"N/A\");\r",
+											"    pm.globals.set(\"operationreversePayment\", reversePayment ? reversePayment.href : \"N/A\");\r",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{merchantToken}}",
+											"type": "string"
+										}
+									]
+								},
 								"method": "GET",
 								"header": [],
 								"body": {
@@ -466,95 +442,101 @@
 									}
 								},
 								"url": {
-									"raw": "https://api.externalintegration.payex.com/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3",
-									"protocol": "https",
+									"raw": "{{baseUrl}}{{paymentId}}?$expand=currentPayment",
 									"host": [
-										"api",
-										"externalintegration",
-										"payex",
-										"com"
+										"{{baseUrl}}{{paymentId}}"
 									],
-									"path": [
-										"psp",
-										"paymentorders",
-										"abcf1b37-6cf5-49a2-1392-08d7fe4a79b3"
+									"query": [
+										{
+											"key": "$expand",
+											"value": "currentPayment"
+										}
 									]
 								}
 							},
-							"status": "OK",
-							"code": 200,
-							"_postman_previewlanguage": "json",
-							"header": [
+							"response": [
 								{
-									"key": "Transfer-Encoding",
-									"value": "chunked"
-								},
-								{
-									"key": "Content-Type",
-									"value": "application/json; charset=utf-8"
-								},
-								{
-									"key": "Server",
-									"value": "Microsoft-IIS/8.5"
-								},
-								{
-									"key": "X-Powered-By",
-									"value": "ASP.NET"
-								},
-								{
-									"key": "Date",
-									"value": "Fri, 22 May 2020 12:21:21 GMT"
-								},
-								{
-									"key": "Strict-Transport-Security",
-									"value": "max-age=16070400; includeSubDomains"
-								}
-							],
-							"cookie": [],
-							"body": "{\n    \"paymentOrder\": {\n        \"id\": \"/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3\",\n        \"created\": \"2020-05-22T12:20:48.8045871Z\",\n        \"updated\": \"2020-05-22T12:21:07.2297997Z\",\n        \"operation\": \"Purchase\",\n        \"state\": \"Ready\",\n        \"currency\": \"SEK\",\n        \"amount\": 10000,\n        \"vatAmount\": 0,\n        \"remainingReversalAmount\": 10000,\n        \"orderItems\": {\n            \"id\": \"/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3/orderitems\"\n        },\n        \"description\": \"test description\",\n        \"initiatingSystemUserAgent\": \"Mozilla/5.0\",\n        \"userAgent\": \"Mozilla/5.0\",\n        \"language\": \"sv-SE\",\n        \"urls\": {\n            \"id\": \"/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3/urls\"\n        },\n        \"payeeInfo\": {\n            \"id\": \"/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3/payeeInfo\"\n        },\n        \"payments\": {\n            \"id\": \"/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3/payments\"\n        },\n        \"currentPayment\": {\n            \"id\": \"/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3/currentpayment\"\n        },\n        \"items\": [\n            {\n                \"creditCard\": {\n                    \"cardBrands\": [\n                        \"Visa\",\n                        \"MasterCard\",\n                        \"Amex\",\n                        \"Dankort\",\n                        \"Diners\",\n                        \"Finax\",\n                        \"Forbrugsforeningen\",\n                        \"Jcb\",\n                        \"IkanoFinansDk\",\n                        \"Lindex\",\n                        \"Maestro\",\n                        \"Ica\"\n                    ]\n                }\n            }\n        ]\n    },\n    \"operations\": [\n        {\n            \"method\": \"POST\",\n            \"href\": \"https://api.externalintegration.payex.com/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3/reversals\",\n            \"rel\": \"create-paymentorder-reversal\",\n            \"contentType\": \"application/json\"\n        },\n        {\n            \"method\": \"POST\",\n            \"href\": \"https://api.externalintegration.payex.com/psp/swish/payments/486721ed-2acb-4c2b-bb24-08d7fe4a9a27/reversals\",\n            \"rel\": \"create-reversal\"\n        },\n        {\n            \"method\": \"GET\",\n            \"href\": \"https://ecom.externalintegration.payex.com/swish/core/scripts/client/px.swish.client.js?token=f9e9782a59ba56bbc496ab85c6e2aacdd06a3a89acf89e2a89267b3b4b1eb07d&Culture=sv-SE\",\n            \"rel\": \"view-payment\",\n            \"contentType\": \"application/javascript\"\n        },\n        {\n            \"method\": \"GET\",\n            \"href\": \"https://api.externalintegration.payex.com/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3/paid\",\n            \"rel\": \"paid-paymentorder\",\n            \"contentType\": \"application/json\"\n        }\n    ]\n}"
-						}
-					]
-				},
-				{
-					"name": "reverse paymentOrder",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{merchantToken}}",
-									"type": "string"
+									"name": "Get paymentOrder",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://api.externalintegration.payex.com/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3",
+											"protocol": "https",
+											"host": [
+												"api",
+												"externalintegration",
+												"payex",
+												"com"
+											],
+											"path": [
+												"psp",
+												"paymentorders",
+												"abcf1b37-6cf5-49a2-1392-08d7fe4a79b3"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Transfer-Encoding",
+											"value": "chunked"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Server",
+											"value": "Microsoft-IIS/8.5"
+										},
+										{
+											"key": "X-Powered-By",
+											"value": "ASP.NET"
+										},
+										{
+											"key": "Date",
+											"value": "Fri, 22 May 2020 12:21:21 GMT"
+										},
+										{
+											"key": "Strict-Transport-Security",
+											"value": "max-age=16070400; includeSubDomains"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"paymentOrder\": {\n        \"id\": \"/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3\",\n        \"created\": \"2020-05-22T12:20:48.8045871Z\",\n        \"updated\": \"2020-05-22T12:21:07.2297997Z\",\n        \"operation\": \"Purchase\",\n        \"state\": \"Ready\",\n        \"currency\": \"SEK\",\n        \"amount\": 10000,\n        \"vatAmount\": 0,\n        \"remainingReversalAmount\": 10000,\n        \"orderItems\": {\n            \"id\": \"/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3/orderitems\"\n        },\n        \"description\": \"test description\",\n        \"initiatingSystemUserAgent\": \"Mozilla/5.0\",\n        \"userAgent\": \"Mozilla/5.0\",\n        \"language\": \"sv-SE\",\n        \"urls\": {\n            \"id\": \"/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3/urls\"\n        },\n        \"payeeInfo\": {\n            \"id\": \"/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3/payeeInfo\"\n        },\n        \"payments\": {\n            \"id\": \"/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3/payments\"\n        },\n        \"currentPayment\": {\n            \"id\": \"/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3/currentpayment\"\n        },\n        \"items\": [\n            {\n                \"creditCard\": {\n                    \"cardBrands\": [\n                        \"Visa\",\n                        \"MasterCard\",\n                        \"Amex\",\n                        \"Dankort\",\n                        \"Diners\",\n                        \"Finax\",\n                        \"Forbrugsforeningen\",\n                        \"Jcb\",\n                        \"IkanoFinansDk\",\n                        \"Lindex\",\n                        \"Maestro\",\n                        \"Ica\"\n                    ]\n                }\n            }\n        ]\n    },\n    \"operations\": [\n        {\n            \"method\": \"POST\",\n            \"href\": \"https://api.externalintegration.payex.com/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3/reversals\",\n            \"rel\": \"create-paymentorder-reversal\",\n            \"contentType\": \"application/json\"\n        },\n        {\n            \"method\": \"POST\",\n            \"href\": \"https://api.externalintegration.payex.com/psp/swish/payments/486721ed-2acb-4c2b-bb24-08d7fe4a9a27/reversals\",\n            \"rel\": \"create-reversal\"\n        },\n        {\n            \"method\": \"GET\",\n            \"href\": \"https://ecom.externalintegration.payex.com/swish/core/scripts/client/px.swish.client.js?token=f9e9782a59ba56bbc496ab85c6e2aacdd06a3a89acf89e2a89267b3b4b1eb07d&Culture=sv-SE\",\n            \"rel\": \"view-payment\",\n            \"contentType\": \"application/javascript\"\n        },\n        {\n            \"method\": \"GET\",\n            \"href\": \"https://api.externalintegration.payex.com/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3/paid\",\n            \"rel\": \"paid-paymentorder\",\n            \"contentType\": \"application/json\"\n        }\n    ]\n}"
 								}
 							]
 						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"transaction\": {\n        \"amount\": 5000,\n        \"vatAmount\": 0,\n        \"bonusAmount\": 0,\n        \"payeeReference\": \"{{payeeReference}}\",\n        \"description\": \"description for transaction\",\n        \"orderItems\": [\n            {\n                \"reference\": \"P1\",\n                \"name\": \"Product1\",\n                \"type\": \"PRODUCT\",\n                \"class\": \"ProductGroup1\",\n                \"itemUrl\": \"https://www.demoshop.com/shop/id=666\",\n                \"imageUrl\": \"https://www.demoshop.com/product1.jpg\",\n                \"description\": \"Product 1 description\",\n                \"discountDescription\": \"Volume discount\",\n                \"quantity\": 2,\n                \"quantityUnit\": \"pcs\",\n                \"unitPrice\": 2500,\n                \"discountPrice\": 0,\n                \"vatPercent\": 0,\n                \"amount\": 5000,\n                \"vatAmount\": 0\n            }\n        ]\n    }\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{operationreversePayment}}",
-							"host": [
-								"{{operationreversePayment}}"
-							]
-						}
-					},
-					"response": [
 						{
 							"name": "reverse paymentOrder",
-							"originalRequest": {
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{merchantToken}}",
+											"type": "string"
+										}
+									]
+								},
 								"method": "POST",
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"transaction\": {\n        \"amount\": 5000,\n        \"vatAmount\": 0,\n        \"bonusAmount\": 0,\n        \"payeeReference\": \"someUniqueReference1590150468\",\n        \"description\": \"description for transaction\",\n        \"orderItems\": [\n            {\n                \"reference\": \"P1\",\n                \"name\": \"Product1\",\n                \"type\": \"PRODUCT\",\n                \"class\": \"ProductGroup1\",\n                \"itemUrl\": \"https://www.demoshop.com/shop/id=666\",\n                \"imageUrl\": \"https://www.demoshop.com/product1.jpg\",\n                \"description\": \"Product 1 description\",\n                \"discountDescription\": \"Volume discount\",\n                \"quantity\": 2,\n                \"quantityUnit\": \"pcs\",\n                \"unitPrice\": 2500,\n                \"discountPrice\": 0,\n                \"vatPercent\": 0,\n                \"amount\": 5000,\n                \"vatAmount\": 0\n            }\n        ]\n    }\n}",
+									"raw": "{\n    \"transaction\": {\n        \"amount\": 5000,\n        \"vatAmount\": 0,\n        \"bonusAmount\": 0,\n        \"payeeReference\": \"{{payeeReference}}\",\n        \"description\": \"description for transaction\",\n        \"orderItems\": [\n            {\n                \"reference\": \"P1\",\n                \"name\": \"Product1\",\n                \"type\": \"PRODUCT\",\n                \"class\": \"ProductGroup1\",\n                \"itemUrl\": \"https://www.demoshop.com/shop/id=666\",\n                \"imageUrl\": \"https://www.demoshop.com/product1.jpg\",\n                \"description\": \"Product 1 description\",\n                \"discountDescription\": \"Volume discount\",\n                \"quantity\": 2,\n                \"quantityUnit\": \"pcs\",\n                \"unitPrice\": 2500,\n                \"discountPrice\": 0,\n                \"vatPercent\": 0,\n                \"amount\": 5000,\n                \"vatAmount\": 0\n            }\n        ]\n    }\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -562,136 +544,129 @@
 									}
 								},
 								"url": {
-									"raw": "https://api.externalintegration.payex.com/psp/paymentorders/9e5f1015-8c99-4b36-2eef-08d7fe4afa97/reversals",
-									"protocol": "https",
+									"raw": "{{operationreversePayment}}",
 									"host": [
-										"api",
-										"externalintegration",
-										"payex",
-										"com"
-									],
-									"path": [
-										"psp",
-										"paymentorders",
-										"9e5f1015-8c99-4b36-2eef-08d7fe4afa97",
-										"reversals"
+										"{{operationreversePayment}}"
 									]
 								}
 							},
-							"status": "OK",
-							"code": 200,
-							"_postman_previewlanguage": "json",
-							"header": [
+							"response": [
 								{
-									"key": "Transfer-Encoding",
-									"value": "chunked"
-								},
-								{
-									"key": "Content-Type",
-									"value": "application/json; charset=utf-8"
-								},
-								{
-									"key": "Server",
-									"value": "Microsoft-IIS/8.5"
-								},
-								{
-									"key": "X-Powered-By",
-									"value": "ASP.NET"
-								},
-								{
-									"key": "Date",
-									"value": "Fri, 22 May 2020 12:27:49 GMT"
-								},
-								{
-									"key": "Strict-Transport-Security",
-									"value": "max-age=16070400; includeSubDomains"
-								}
-							],
-							"cookie": [],
-							"body": "{\n    \"payment\": \"/psp/creditcard/payments/a6d69a75-d2a3-4ab1-c244-08d7fe4b2efb\",\n    \"reversal\": {\n        \"id\": \"/psp/creditcard/payments/a6d69a75-d2a3-4ab1-c244-08d7fe4b2efb/reversals/a12acfb5-61ae-460c-2346-08d7fe4afe14\",\n        \"transaction\": {\n            \"id\": \"/psp/creditcard/payments/a6d69a75-d2a3-4ab1-c244-08d7fe4b2efb/transactions/a12acfb5-61ae-460c-2346-08d7fe4afe14\",\n            \"created\": \"2020-05-22T12:27:49.2383655Z\",\n            \"updated\": \"2020-05-22T12:27:49.444977Z\",\n            \"type\": \"Reversal\",\n            \"state\": \"Completed\",\n            \"number\": 40101653482,\n            \"amount\": 5000,\n            \"vatAmount\": 0,\n            \"description\": \"description for transaction\",\n            \"payeeReference\": \"someUniqueReference1590150468\",\n            \"isOperational\": false,\n            \"operations\": []\n        }\n    }\n}"
-						}
-					]
-				},
-				{
-					"name": "Get paymentOrder (verify reversalOK and proceed)",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "9600b838-83fe-4e54-991b-bfb4e71e5d71",
-								"exec": [
-									"responseCode = pm.response.code;\r",
-									"responseBody = pm.response.json();\r",
-									"\r",
-									"if (responseCode >= 200 && responseCode < 300) {\r",
-									"    const operations = responseBody.operations;\r",
-									"    const redirectPayment = operations.find(operations => operations.rel.startsWith(\"redirect-\"));\r",
-									"    const seamlessPayment = operations.find(operations => operations.rel === \"view-paymenOrder\");\r",
-									"    const abortPayment = operations.find(operations => operations.rel.includes(\"abort\"));\r",
-									"    const capturePayment = operations.find(operations => operations.rel === \"create-paymentorder-capture\");\r",
-									"    const cancelPayment = operations.find(operations => operations.rel === \"create-paymentorder-cancel\");\r",
-									"    const reversePayment = operations.find(operations => operations.rel === \"create-paymentorder-reversal\");\r",
-									"    const paidPayment = operations.find(operations => operations.rel === \"paid-paymentOrder\");\r",
-									"    // Use data to populate immediately relevant data to continue flow.\r",
-									"    if (!paidPayment) {                                                                            // These will only be set if the operation is found\r",
-									"        pm.globals.set(\"operationRedirectPayment\", redirectPayment ? redirectPayment.href : \"N/A\"); // This is to avoid using data of wrong payment\r",
-									"        pm.globals.set(\"operationSeamlessPayment\", seamlessPayment ? seamlessPayment.href : \"N/A\"); // Furthermore you will get an error \r",
-									"        pm.globals.set(\"operationAbortPayment\", abortPayment ? abortPayment.href : \"N/A\");          // when trying to use N/A data.\r",
-									"    }\r",
-									"    else\r",
-									"        pm.globals.set(\"operationPaidPayment\", paidPayment.href);                                        // this one has already been confirmed exists when setting it here.\r",
-									"\r",
-									"    pm.globals.set(\"operationcapturePayment\", capturePayment ? capturePayment.href : \"N/A\");\r",
-									"    pm.globals.set(\"operationcancelPayment\", cancelPayment ? cancelPayment.href : \"N/A\");\r",
-									"    pm.globals.set(\"operationreversePayment\", reversePayment ? reversePayment.href : \"N/A\");\r",
-									"}"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{merchantToken}}",
-									"type": "string"
+									"name": "reverse paymentOrder",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"transaction\": {\n        \"amount\": 5000,\n        \"vatAmount\": 0,\n        \"bonusAmount\": 0,\n        \"payeeReference\": \"someUniqueReference1590150468\",\n        \"description\": \"description for transaction\",\n        \"orderItems\": [\n            {\n                \"reference\": \"P1\",\n                \"name\": \"Product1\",\n                \"type\": \"PRODUCT\",\n                \"class\": \"ProductGroup1\",\n                \"itemUrl\": \"https://www.demoshop.com/shop/id=666\",\n                \"imageUrl\": \"https://www.demoshop.com/product1.jpg\",\n                \"description\": \"Product 1 description\",\n                \"discountDescription\": \"Volume discount\",\n                \"quantity\": 2,\n                \"quantityUnit\": \"pcs\",\n                \"unitPrice\": 2500,\n                \"discountPrice\": 0,\n                \"vatPercent\": 0,\n                \"amount\": 5000,\n                \"vatAmount\": 0\n            }\n        ]\n    }\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://api.externalintegration.payex.com/psp/paymentorders/9e5f1015-8c99-4b36-2eef-08d7fe4afa97/reversals",
+											"protocol": "https",
+											"host": [
+												"api",
+												"externalintegration",
+												"payex",
+												"com"
+											],
+											"path": [
+												"psp",
+												"paymentorders",
+												"9e5f1015-8c99-4b36-2eef-08d7fe4afa97",
+												"reversals"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Transfer-Encoding",
+											"value": "chunked"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Server",
+											"value": "Microsoft-IIS/8.5"
+										},
+										{
+											"key": "X-Powered-By",
+											"value": "ASP.NET"
+										},
+										{
+											"key": "Date",
+											"value": "Fri, 22 May 2020 12:27:49 GMT"
+										},
+										{
+											"key": "Strict-Transport-Security",
+											"value": "max-age=16070400; includeSubDomains"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"payment\": \"/psp/creditcard/payments/a6d69a75-d2a3-4ab1-c244-08d7fe4b2efb\",\n    \"reversal\": {\n        \"id\": \"/psp/creditcard/payments/a6d69a75-d2a3-4ab1-c244-08d7fe4b2efb/reversals/a12acfb5-61ae-460c-2346-08d7fe4afe14\",\n        \"transaction\": {\n            \"id\": \"/psp/creditcard/payments/a6d69a75-d2a3-4ab1-c244-08d7fe4b2efb/transactions/a12acfb5-61ae-460c-2346-08d7fe4afe14\",\n            \"created\": \"2020-05-22T12:27:49.2383655Z\",\n            \"updated\": \"2020-05-22T12:27:49.444977Z\",\n            \"type\": \"Reversal\",\n            \"state\": \"Completed\",\n            \"number\": 40101653482,\n            \"amount\": 5000,\n            \"vatAmount\": 0,\n            \"description\": \"description for transaction\",\n            \"payeeReference\": \"someUniqueReference1590150468\",\n            \"isOperational\": false,\n            \"operations\": []\n        }\n    }\n}"
 								}
 							]
 						},
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}{{paymentId}}?$expand=currentPayment",
-							"host": [
-								"{{baseUrl}}{{paymentId}}"
-							],
-							"query": [
-								{
-									"key": "$expand",
-									"value": "currentPayment"
-								}
-							]
-						}
-					},
-					"response": [
 						{
-							"name": "Get paymentOrder",
-							"originalRequest": {
+							"name": "Get paymentOrder (verify reversalOK and proceed)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"responseCode = pm.response.code;\r",
+											"responseBody = pm.response.json();\r",
+											"\r",
+											"if (responseCode >= 200 && responseCode < 300) {\r",
+											"    const operations = responseBody.operations;\r",
+											"    const redirectPayment = operations.find(operations => operations.rel.startsWith(\"redirect-\"));\r",
+											"    const seamlessPayment = operations.find(operations => operations.rel === \"view-paymenOrder\");\r",
+											"    const abortPayment = operations.find(operations => operations.rel.includes(\"abort\"));\r",
+											"    const capturePayment = operations.find(operations => operations.rel === \"create-paymentorder-capture\");\r",
+											"    const cancelPayment = operations.find(operations => operations.rel === \"create-paymentorder-cancel\");\r",
+											"    const reversePayment = operations.find(operations => operations.rel === \"create-paymentorder-reversal\");\r",
+											"    const paidPayment = operations.find(operations => operations.rel === \"paid-paymentOrder\");\r",
+											"    // Use data to populate immediately relevant data to continue flow.\r",
+											"    if (!paidPayment) {                                                                            // These will only be set if the operation is found\r",
+											"        pm.globals.set(\"operationRedirectPayment\", redirectPayment ? redirectPayment.href : \"N/A\"); // This is to avoid using data of wrong payment\r",
+											"        pm.globals.set(\"operationSeamlessPayment\", seamlessPayment ? seamlessPayment.href : \"N/A\"); // Furthermore you will get an error \r",
+											"        pm.globals.set(\"operationAbortPayment\", abortPayment ? abortPayment.href : \"N/A\");          // when trying to use N/A data.\r",
+											"    }\r",
+											"    else\r",
+											"        pm.globals.set(\"operationPaidPayment\", paidPayment.href);                                        // this one has already been confirmed exists when setting it here.\r",
+											"\r",
+											"    pm.globals.set(\"operationcapturePayment\", capturePayment ? capturePayment.href : \"N/A\");\r",
+											"    pm.globals.set(\"operationcancelPayment\", cancelPayment ? cancelPayment.href : \"N/A\");\r",
+											"    pm.globals.set(\"operationreversePayment\", reversePayment ? reversePayment.href : \"N/A\");\r",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{merchantToken}}",
+											"type": "string"
+										}
+									]
+								},
 								"method": "GET",
 								"header": [],
 								"body": {
@@ -704,95 +679,101 @@
 									}
 								},
 								"url": {
-									"raw": "https://api.externalintegration.payex.com/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3",
-									"protocol": "https",
+									"raw": "{{baseUrl}}{{paymentId}}?$expand=currentPayment",
 									"host": [
-										"api",
-										"externalintegration",
-										"payex",
-										"com"
+										"{{baseUrl}}{{paymentId}}"
 									],
-									"path": [
-										"psp",
-										"paymentorders",
-										"abcf1b37-6cf5-49a2-1392-08d7fe4a79b3"
+									"query": [
+										{
+											"key": "$expand",
+											"value": "currentPayment"
+										}
 									]
 								}
 							},
-							"status": "OK",
-							"code": 200,
-							"_postman_previewlanguage": "json",
-							"header": [
+							"response": [
 								{
-									"key": "Transfer-Encoding",
-									"value": "chunked"
-								},
-								{
-									"key": "Content-Type",
-									"value": "application/json; charset=utf-8"
-								},
-								{
-									"key": "Server",
-									"value": "Microsoft-IIS/8.5"
-								},
-								{
-									"key": "X-Powered-By",
-									"value": "ASP.NET"
-								},
-								{
-									"key": "Date",
-									"value": "Fri, 22 May 2020 12:21:21 GMT"
-								},
-								{
-									"key": "Strict-Transport-Security",
-									"value": "max-age=16070400; includeSubDomains"
-								}
-							],
-							"cookie": [],
-							"body": "{\n    \"paymentOrder\": {\n        \"id\": \"/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3\",\n        \"created\": \"2020-05-22T12:20:48.8045871Z\",\n        \"updated\": \"2020-05-22T12:21:07.2297997Z\",\n        \"operation\": \"Purchase\",\n        \"state\": \"Ready\",\n        \"currency\": \"SEK\",\n        \"amount\": 10000,\n        \"vatAmount\": 0,\n        \"remainingReversalAmount\": 10000,\n        \"orderItems\": {\n            \"id\": \"/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3/orderitems\"\n        },\n        \"description\": \"test description\",\n        \"initiatingSystemUserAgent\": \"Mozilla/5.0\",\n        \"userAgent\": \"Mozilla/5.0\",\n        \"language\": \"sv-SE\",\n        \"urls\": {\n            \"id\": \"/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3/urls\"\n        },\n        \"payeeInfo\": {\n            \"id\": \"/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3/payeeInfo\"\n        },\n        \"payments\": {\n            \"id\": \"/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3/payments\"\n        },\n        \"currentPayment\": {\n            \"id\": \"/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3/currentpayment\"\n        },\n        \"items\": [\n            {\n                \"creditCard\": {\n                    \"cardBrands\": [\n                        \"Visa\",\n                        \"MasterCard\",\n                        \"Amex\",\n                        \"Dankort\",\n                        \"Diners\",\n                        \"Finax\",\n                        \"Forbrugsforeningen\",\n                        \"Jcb\",\n                        \"IkanoFinansDk\",\n                        \"Lindex\",\n                        \"Maestro\",\n                        \"Ica\"\n                    ]\n                }\n            }\n        ]\n    },\n    \"operations\": [\n        {\n            \"method\": \"POST\",\n            \"href\": \"https://api.externalintegration.payex.com/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3/reversals\",\n            \"rel\": \"create-paymentorder-reversal\",\n            \"contentType\": \"application/json\"\n        },\n        {\n            \"method\": \"POST\",\n            \"href\": \"https://api.externalintegration.payex.com/psp/swish/payments/486721ed-2acb-4c2b-bb24-08d7fe4a9a27/reversals\",\n            \"rel\": \"create-reversal\"\n        },\n        {\n            \"method\": \"GET\",\n            \"href\": \"https://ecom.externalintegration.payex.com/swish/core/scripts/client/px.swish.client.js?token=f9e9782a59ba56bbc496ab85c6e2aacdd06a3a89acf89e2a89267b3b4b1eb07d&Culture=sv-SE\",\n            \"rel\": \"view-payment\",\n            \"contentType\": \"application/javascript\"\n        },\n        {\n            \"method\": \"GET\",\n            \"href\": \"https://api.externalintegration.payex.com/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3/paid\",\n            \"rel\": \"paid-paymentorder\",\n            \"contentType\": \"application/json\"\n        }\n    ]\n}"
-						}
-					]
-				},
-				{
-					"name": "Cancel paymentOrder",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{merchantToken}}",
-									"type": "string"
+									"name": "Get paymentOrder",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://api.externalintegration.payex.com/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3",
+											"protocol": "https",
+											"host": [
+												"api",
+												"externalintegration",
+												"payex",
+												"com"
+											],
+											"path": [
+												"psp",
+												"paymentorders",
+												"abcf1b37-6cf5-49a2-1392-08d7fe4a79b3"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Transfer-Encoding",
+											"value": "chunked"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Server",
+											"value": "Microsoft-IIS/8.5"
+										},
+										{
+											"key": "X-Powered-By",
+											"value": "ASP.NET"
+										},
+										{
+											"key": "Date",
+											"value": "Fri, 22 May 2020 12:21:21 GMT"
+										},
+										{
+											"key": "Strict-Transport-Security",
+											"value": "max-age=16070400; includeSubDomains"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"paymentOrder\": {\n        \"id\": \"/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3\",\n        \"created\": \"2020-05-22T12:20:48.8045871Z\",\n        \"updated\": \"2020-05-22T12:21:07.2297997Z\",\n        \"operation\": \"Purchase\",\n        \"state\": \"Ready\",\n        \"currency\": \"SEK\",\n        \"amount\": 10000,\n        \"vatAmount\": 0,\n        \"remainingReversalAmount\": 10000,\n        \"orderItems\": {\n            \"id\": \"/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3/orderitems\"\n        },\n        \"description\": \"test description\",\n        \"initiatingSystemUserAgent\": \"Mozilla/5.0\",\n        \"userAgent\": \"Mozilla/5.0\",\n        \"language\": \"sv-SE\",\n        \"urls\": {\n            \"id\": \"/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3/urls\"\n        },\n        \"payeeInfo\": {\n            \"id\": \"/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3/payeeInfo\"\n        },\n        \"payments\": {\n            \"id\": \"/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3/payments\"\n        },\n        \"currentPayment\": {\n            \"id\": \"/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3/currentpayment\"\n        },\n        \"items\": [\n            {\n                \"creditCard\": {\n                    \"cardBrands\": [\n                        \"Visa\",\n                        \"MasterCard\",\n                        \"Amex\",\n                        \"Dankort\",\n                        \"Diners\",\n                        \"Finax\",\n                        \"Forbrugsforeningen\",\n                        \"Jcb\",\n                        \"IkanoFinansDk\",\n                        \"Lindex\",\n                        \"Maestro\",\n                        \"Ica\"\n                    ]\n                }\n            }\n        ]\n    },\n    \"operations\": [\n        {\n            \"method\": \"POST\",\n            \"href\": \"https://api.externalintegration.payex.com/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3/reversals\",\n            \"rel\": \"create-paymentorder-reversal\",\n            \"contentType\": \"application/json\"\n        },\n        {\n            \"method\": \"POST\",\n            \"href\": \"https://api.externalintegration.payex.com/psp/swish/payments/486721ed-2acb-4c2b-bb24-08d7fe4a9a27/reversals\",\n            \"rel\": \"create-reversal\"\n        },\n        {\n            \"method\": \"GET\",\n            \"href\": \"https://ecom.externalintegration.payex.com/swish/core/scripts/client/px.swish.client.js?token=f9e9782a59ba56bbc496ab85c6e2aacdd06a3a89acf89e2a89267b3b4b1eb07d&Culture=sv-SE\",\n            \"rel\": \"view-payment\",\n            \"contentType\": \"application/javascript\"\n        },\n        {\n            \"method\": \"GET\",\n            \"href\": \"https://api.externalintegration.payex.com/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3/paid\",\n            \"rel\": \"paid-paymentorder\",\n            \"contentType\": \"application/json\"\n        }\n    ]\n}"
 								}
 							]
 						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"transaction\": {\n        \"description\": \"Test Cancellation\",\n        \"payeeReference\": \"{{payeeReference}}\"\n    }\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{operationcancelPayment}}",
-							"host": [
-								"{{operationcancelPayment}}"
-							]
-						}
-					},
-					"response": [
 						{
 							"name": "Cancel paymentOrder",
-							"originalRequest": {
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{merchantToken}}",
+											"type": "string"
+										}
+									]
+								},
 								"method": "POST",
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"transaction\": {\n        \"description\": \"Test Cancellation\",\n        \"payeeReference\": \"someUniqueReference1590150614\"\n    }\n}",
+									"raw": "{\n    \"transaction\": {\n        \"description\": \"Test Cancellation\",\n        \"payeeReference\": \"{{payeeReference}}\"\n    }\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -800,136 +781,129 @@
 									}
 								},
 								"url": {
-									"raw": "https://api.externalintegration.payex.com/psp/paymentorders/47b42487-3dda-448d-2ef1-08d7fe4afa97/cancellations",
-									"protocol": "https",
+									"raw": "{{operationcancelPayment}}",
 									"host": [
-										"api",
-										"externalintegration",
-										"payex",
-										"com"
-									],
-									"path": [
-										"psp",
-										"paymentorders",
-										"47b42487-3dda-448d-2ef1-08d7fe4afa97",
-										"cancellations"
+										"{{operationcancelPayment}}"
 									]
 								}
 							},
-							"status": "OK",
-							"code": 200,
-							"_postman_previewlanguage": "json",
-							"header": [
+							"response": [
 								{
-									"key": "Content-Type",
-									"value": "application/json; charset=utf-8"
-								},
-								{
-									"key": "Server",
-									"value": "Microsoft-IIS/8.5"
-								},
-								{
-									"key": "X-Powered-By",
-									"value": "ASP.NET"
-								},
-								{
-									"key": "Date",
-									"value": "Fri, 22 May 2020 12:30:15 GMT"
-								},
-								{
-									"key": "Content-Length",
-									"value": "641"
-								},
-								{
-									"key": "Strict-Transport-Security",
-									"value": "max-age=16070400; includeSubDomains"
-								}
-							],
-							"cookie": [],
-							"body": "{\n    \"payment\": \"/psp/creditcard/payments/9ed542fd-37a4-474e-c248-08d7fe4b2efb\",\n    \"cancellation\": {\n        \"id\": \"/psp/creditcard/payments/9ed542fd-37a4-474e-c248-08d7fe4b2efb/cancellations/d2101567-2e77-4fc2-234c-08d7fe4afe14\",\n        \"transaction\": {\n            \"id\": \"/psp/creditcard/payments/9ed542fd-37a4-474e-c248-08d7fe4b2efb/transactions/d2101567-2e77-4fc2-234c-08d7fe4afe14\",\n            \"created\": \"2020-05-22T12:30:15.6323618Z\",\n            \"updated\": \"2020-05-22T12:30:15.6777095Z\",\n            \"type\": \"Cancellation\",\n            \"state\": \"Completed\",\n            \"number\": 40101653501,\n            \"amount\": 5000,\n            \"vatAmount\": 0,\n            \"description\": \"Test Cancellation\",\n            \"payeeReference\": \"someUniqueReference1590150614\",\n            \"isOperational\": false,\n            \"operations\": []\n        }\n    }\n}"
-						}
-					]
-				},
-				{
-					"name": "Get paymentOrder (verify cancel OK)",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"id": "c4434b70-9850-4467-b1d5-fce6e3ef8268",
-								"exec": [
-									"responseCode = pm.response.code;\r",
-									"responseBody = pm.response.json();\r",
-									"\r",
-									"if (responseCode >= 200 && responseCode < 300) {\r",
-									"    const operations = responseBody.operations;\r",
-									"    const redirectPayment = operations.find(operations => operations.rel.startsWith(\"redirect-\"));\r",
-									"    const seamlessPayment = operations.find(operations => operations.rel === \"view-paymenOrder\");\r",
-									"    const abortPayment = operations.find(operations => operations.rel.includes(\"abort\"));\r",
-									"    const capturePayment = operations.find(operations => operations.rel === \"create-paymentorder-capture\");\r",
-									"    const cancelPayment = operations.find(operations => operations.rel === \"create-paymentorder-cancel\");\r",
-									"    const reversePayment = operations.find(operations => operations.rel === \"create-paymentorder-reversal\");\r",
-									"    const paidPayment = operations.find(operations => operations.rel === \"paid-paymentOrder\");\r",
-									"    // Use data to populate immediately relevant data to continue flow.\r",
-									"    if (!paidPayment) {                                                                            // These will only be set if the operation is found\r",
-									"        pm.globals.set(\"operationRedirectPayment\", redirectPayment ? redirectPayment.href : \"N/A\"); // This is to avoid using data of wrong payment\r",
-									"        pm.globals.set(\"operationSeamlessPayment\", seamlessPayment ? seamlessPayment.href : \"N/A\"); // Furthermore you will get an error \r",
-									"        pm.globals.set(\"operationAbortPayment\", abortPayment ? abortPayment.href : \"N/A\");          // when trying to use N/A data.\r",
-									"    }\r",
-									"    else\r",
-									"        pm.globals.set(\"operationPaidPayment\", paidPayment.href);                                        // this one has already been confirmed exists when setting it here.\r",
-									"\r",
-									"    pm.globals.set(\"operationcapturePayment\", capturePayment ? capturePayment.href : \"N/A\");\r",
-									"    pm.globals.set(\"operationcancelPayment\", cancelPayment ? cancelPayment.href : \"N/A\");\r",
-									"    pm.globals.set(\"operationreversePayment\", reversePayment ? reversePayment.href : \"N/A\");\r",
-									"}"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{merchantToken}}",
-									"type": "string"
+									"name": "Cancel paymentOrder",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"transaction\": {\n        \"description\": \"Test Cancellation\",\n        \"payeeReference\": \"someUniqueReference1590150614\"\n    }\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://api.externalintegration.payex.com/psp/paymentorders/47b42487-3dda-448d-2ef1-08d7fe4afa97/cancellations",
+											"protocol": "https",
+											"host": [
+												"api",
+												"externalintegration",
+												"payex",
+												"com"
+											],
+											"path": [
+												"psp",
+												"paymentorders",
+												"47b42487-3dda-448d-2ef1-08d7fe4afa97",
+												"cancellations"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Server",
+											"value": "Microsoft-IIS/8.5"
+										},
+										{
+											"key": "X-Powered-By",
+											"value": "ASP.NET"
+										},
+										{
+											"key": "Date",
+											"value": "Fri, 22 May 2020 12:30:15 GMT"
+										},
+										{
+											"key": "Content-Length",
+											"value": "641"
+										},
+										{
+											"key": "Strict-Transport-Security",
+											"value": "max-age=16070400; includeSubDomains"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"payment\": \"/psp/creditcard/payments/9ed542fd-37a4-474e-c248-08d7fe4b2efb\",\n    \"cancellation\": {\n        \"id\": \"/psp/creditcard/payments/9ed542fd-37a4-474e-c248-08d7fe4b2efb/cancellations/d2101567-2e77-4fc2-234c-08d7fe4afe14\",\n        \"transaction\": {\n            \"id\": \"/psp/creditcard/payments/9ed542fd-37a4-474e-c248-08d7fe4b2efb/transactions/d2101567-2e77-4fc2-234c-08d7fe4afe14\",\n            \"created\": \"2020-05-22T12:30:15.6323618Z\",\n            \"updated\": \"2020-05-22T12:30:15.6777095Z\",\n            \"type\": \"Cancellation\",\n            \"state\": \"Completed\",\n            \"number\": 40101653501,\n            \"amount\": 5000,\n            \"vatAmount\": 0,\n            \"description\": \"Test Cancellation\",\n            \"payeeReference\": \"someUniqueReference1590150614\",\n            \"isOperational\": false,\n            \"operations\": []\n        }\n    }\n}"
 								}
 							]
 						},
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}{{paymentId}}?$expand=currentPayment",
-							"host": [
-								"{{baseUrl}}{{paymentId}}"
-							],
-							"query": [
-								{
-									"key": "$expand",
-									"value": "currentPayment"
-								}
-							]
-						}
-					},
-					"response": [
 						{
-							"name": "Get paymentOrder",
-							"originalRequest": {
+							"name": "Get paymentOrder (verify cancel OK)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"responseCode = pm.response.code;\r",
+											"responseBody = pm.response.json();\r",
+											"\r",
+											"if (responseCode >= 200 && responseCode < 300) {\r",
+											"    const operations = responseBody.operations;\r",
+											"    const redirectPayment = operations.find(operations => operations.rel.startsWith(\"redirect-\"));\r",
+											"    const seamlessPayment = operations.find(operations => operations.rel === \"view-paymenOrder\");\r",
+											"    const abortPayment = operations.find(operations => operations.rel.includes(\"abort\"));\r",
+											"    const capturePayment = operations.find(operations => operations.rel === \"create-paymentorder-capture\");\r",
+											"    const cancelPayment = operations.find(operations => operations.rel === \"create-paymentorder-cancel\");\r",
+											"    const reversePayment = operations.find(operations => operations.rel === \"create-paymentorder-reversal\");\r",
+											"    const paidPayment = operations.find(operations => operations.rel === \"paid-paymentOrder\");\r",
+											"    // Use data to populate immediately relevant data to continue flow.\r",
+											"    if (!paidPayment) {                                                                            // These will only be set if the operation is found\r",
+											"        pm.globals.set(\"operationRedirectPayment\", redirectPayment ? redirectPayment.href : \"N/A\"); // This is to avoid using data of wrong payment\r",
+											"        pm.globals.set(\"operationSeamlessPayment\", seamlessPayment ? seamlessPayment.href : \"N/A\"); // Furthermore you will get an error \r",
+											"        pm.globals.set(\"operationAbortPayment\", abortPayment ? abortPayment.href : \"N/A\");          // when trying to use N/A data.\r",
+											"    }\r",
+											"    else\r",
+											"        pm.globals.set(\"operationPaidPayment\", paidPayment.href);                                        // this one has already been confirmed exists when setting it here.\r",
+											"\r",
+											"    pm.globals.set(\"operationcapturePayment\", capturePayment ? capturePayment.href : \"N/A\");\r",
+											"    pm.globals.set(\"operationcancelPayment\", cancelPayment ? cancelPayment.href : \"N/A\");\r",
+											"    pm.globals.set(\"operationreversePayment\", reversePayment ? reversePayment.href : \"N/A\");\r",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{merchantToken}}",
+											"type": "string"
+										}
+									]
+								},
 								"method": "GET",
 								"header": [],
 								"body": {
@@ -942,60 +916,223 @@
 									}
 								},
 								"url": {
-									"raw": "https://api.externalintegration.payex.com/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3",
-									"protocol": "https",
+									"raw": "{{baseUrl}}{{paymentId}}?$expand=currentPayment",
 									"host": [
-										"api",
-										"externalintegration",
-										"payex",
-										"com"
+										"{{baseUrl}}{{paymentId}}"
 									],
-									"path": [
-										"psp",
-										"paymentorders",
-										"abcf1b37-6cf5-49a2-1392-08d7fe4a79b3"
+									"query": [
+										{
+											"key": "$expand",
+											"value": "currentPayment"
+										}
 									]
 								}
 							},
-							"status": "OK",
-							"code": 200,
-							"_postman_previewlanguage": "json",
-							"header": [
+							"response": [
 								{
-									"key": "Transfer-Encoding",
-									"value": "chunked"
-								},
+									"name": "Get paymentOrder",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://api.externalintegration.payex.com/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3",
+											"protocol": "https",
+											"host": [
+												"api",
+												"externalintegration",
+												"payex",
+												"com"
+											],
+											"path": [
+												"psp",
+												"paymentorders",
+												"abcf1b37-6cf5-49a2-1392-08d7fe4a79b3"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Transfer-Encoding",
+											"value": "chunked"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Server",
+											"value": "Microsoft-IIS/8.5"
+										},
+										{
+											"key": "X-Powered-By",
+											"value": "ASP.NET"
+										},
+										{
+											"key": "Date",
+											"value": "Fri, 22 May 2020 12:21:21 GMT"
+										},
+										{
+											"key": "Strict-Transport-Security",
+											"value": "max-age=16070400; includeSubDomains"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"paymentOrder\": {\n        \"id\": \"/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3\",\n        \"created\": \"2020-05-22T12:20:48.8045871Z\",\n        \"updated\": \"2020-05-22T12:21:07.2297997Z\",\n        \"operation\": \"Purchase\",\n        \"state\": \"Ready\",\n        \"currency\": \"SEK\",\n        \"amount\": 10000,\n        \"vatAmount\": 0,\n        \"remainingReversalAmount\": 10000,\n        \"orderItems\": {\n            \"id\": \"/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3/orderitems\"\n        },\n        \"description\": \"test description\",\n        \"initiatingSystemUserAgent\": \"Mozilla/5.0\",\n        \"userAgent\": \"Mozilla/5.0\",\n        \"language\": \"sv-SE\",\n        \"urls\": {\n            \"id\": \"/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3/urls\"\n        },\n        \"payeeInfo\": {\n            \"id\": \"/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3/payeeInfo\"\n        },\n        \"payments\": {\n            \"id\": \"/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3/payments\"\n        },\n        \"currentPayment\": {\n            \"id\": \"/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3/currentpayment\"\n        },\n        \"items\": [\n            {\n                \"creditCard\": {\n                    \"cardBrands\": [\n                        \"Visa\",\n                        \"MasterCard\",\n                        \"Amex\",\n                        \"Dankort\",\n                        \"Diners\",\n                        \"Finax\",\n                        \"Forbrugsforeningen\",\n                        \"Jcb\",\n                        \"IkanoFinansDk\",\n                        \"Lindex\",\n                        \"Maestro\",\n                        \"Ica\"\n                    ]\n                }\n            }\n        ]\n    },\n    \"operations\": [\n        {\n            \"method\": \"POST\",\n            \"href\": \"https://api.externalintegration.payex.com/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3/reversals\",\n            \"rel\": \"create-paymentorder-reversal\",\n            \"contentType\": \"application/json\"\n        },\n        {\n            \"method\": \"POST\",\n            \"href\": \"https://api.externalintegration.payex.com/psp/swish/payments/486721ed-2acb-4c2b-bb24-08d7fe4a9a27/reversals\",\n            \"rel\": \"create-reversal\"\n        },\n        {\n            \"method\": \"GET\",\n            \"href\": \"https://ecom.externalintegration.payex.com/swish/core/scripts/client/px.swish.client.js?token=f9e9782a59ba56bbc496ab85c6e2aacdd06a3a89acf89e2a89267b3b4b1eb07d&Culture=sv-SE\",\n            \"rel\": \"view-payment\",\n            \"contentType\": \"application/javascript\"\n        },\n        {\n            \"method\": \"GET\",\n            \"href\": \"https://api.externalintegration.payex.com/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3/paid\",\n            \"rel\": \"paid-paymentorder\",\n            \"contentType\": \"application/json\"\n        }\n    ]\n}"
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "recur paymentOrder",
+					"item": [
+						{
+							"name": "Recur paymentOrder",
+							"event": [
 								{
-									"key": "Content-Type",
-									"value": "application/json; charset=utf-8"
-								},
-								{
-									"key": "Server",
-									"value": "Microsoft-IIS/8.5"
-								},
-								{
-									"key": "X-Powered-By",
-									"value": "ASP.NET"
-								},
-								{
-									"key": "Date",
-									"value": "Fri, 22 May 2020 12:21:21 GMT"
-								},
-								{
-									"key": "Strict-Transport-Security",
-									"value": "max-age=16070400; includeSubDomains"
+									"listen": "test",
+									"script": {
+										"exec": [
+											"responseCode = pm.response.code;\r",
+											"responseBody = pm.response.json();\r",
+											"\r",
+											"if (responseCode >= 200 && responseCode < 300) {\r",
+											"    // Finding the values to set to globals\r",
+											"    const paymentId = responseBody.paymentOrder.id;\r",
+											"    const operations = responseBody.operations;\r",
+											"    const redirectPayment = operations.find(operations => operations.rel.startsWith(\"redirect-\"));\r",
+											"    const seamlessPayment = operations.find(operations => operations.rel === \"view-authorization\");\r",
+											"    const abortPayment = operations.find(operations => operations.rel.includes(\"abort\"));\r",
+											"    // Use data to populate immediately relevant data to continue flow.\r",
+											"    pm.environment.set(\"paymentId\", paymentId);                                                 // These will only be set if the operation is found\r",
+											"    pm.globals.set(\"operationRedirectPayment\", redirectPayment ? redirectPayment.href : \"N/A\"); // This is to avoid using data of wrong payment\r",
+											"    pm.globals.set(\"operationSeamlessPayment\", seamlessPayment ? seamlessPayment.href : \"N/A\"); // Furthermore you will get an error \r",
+											"    pm.globals.set(\"operationAbortPayment\", abortPayment ? abortPayment.href : \"N/A\");          // when trying to use N/A data.\r",
+											"}"
+										],
+										"type": "text/javascript"
+									}
 								}
 							],
-							"cookie": [],
-							"body": "{\n    \"paymentOrder\": {\n        \"id\": \"/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3\",\n        \"created\": \"2020-05-22T12:20:48.8045871Z\",\n        \"updated\": \"2020-05-22T12:21:07.2297997Z\",\n        \"operation\": \"Purchase\",\n        \"state\": \"Ready\",\n        \"currency\": \"SEK\",\n        \"amount\": 10000,\n        \"vatAmount\": 0,\n        \"remainingReversalAmount\": 10000,\n        \"orderItems\": {\n            \"id\": \"/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3/orderitems\"\n        },\n        \"description\": \"test description\",\n        \"initiatingSystemUserAgent\": \"Mozilla/5.0\",\n        \"userAgent\": \"Mozilla/5.0\",\n        \"language\": \"sv-SE\",\n        \"urls\": {\n            \"id\": \"/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3/urls\"\n        },\n        \"payeeInfo\": {\n            \"id\": \"/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3/payeeInfo\"\n        },\n        \"payments\": {\n            \"id\": \"/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3/payments\"\n        },\n        \"currentPayment\": {\n            \"id\": \"/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3/currentpayment\"\n        },\n        \"items\": [\n            {\n                \"creditCard\": {\n                    \"cardBrands\": [\n                        \"Visa\",\n                        \"MasterCard\",\n                        \"Amex\",\n                        \"Dankort\",\n                        \"Diners\",\n                        \"Finax\",\n                        \"Forbrugsforeningen\",\n                        \"Jcb\",\n                        \"IkanoFinansDk\",\n                        \"Lindex\",\n                        \"Maestro\",\n                        \"Ica\"\n                    ]\n                }\n            }\n        ]\n    },\n    \"operations\": [\n        {\n            \"method\": \"POST\",\n            \"href\": \"https://api.externalintegration.payex.com/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3/reversals\",\n            \"rel\": \"create-paymentorder-reversal\",\n            \"contentType\": \"application/json\"\n        },\n        {\n            \"method\": \"POST\",\n            \"href\": \"https://api.externalintegration.payex.com/psp/swish/payments/486721ed-2acb-4c2b-bb24-08d7fe4a9a27/reversals\",\n            \"rel\": \"create-reversal\"\n        },\n        {\n            \"method\": \"GET\",\n            \"href\": \"https://ecom.externalintegration.payex.com/swish/core/scripts/client/px.swish.client.js?token=f9e9782a59ba56bbc496ab85c6e2aacdd06a3a89acf89e2a89267b3b4b1eb07d&Culture=sv-SE\",\n            \"rel\": \"view-payment\",\n            \"contentType\": \"application/javascript\"\n        },\n        {\n            \"method\": \"GET\",\n            \"href\": \"https://api.externalintegration.payex.com/psp/paymentorders/abcf1b37-6cf5-49a2-1392-08d7fe4a79b3/paid\",\n            \"rel\": \"paid-paymentorder\",\n            \"contentType\": \"application/json\"\n        }\n    ]\n}"
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{merchantToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"paymentorder\": {\n        \"operation\": \"Recur\",\n        \"recurrenceToken\": \"{{recurrenceToken}}\",\n        \"currency\": \"{{currency}}\",\n        \"amount\": 10000,\n        \"vatAmount\": 0,\n        \"description\": \"{{description}}\",\n        \"userAgent\": \"Mozilla/5.0...\",\n        \"language\": \"{{language}}\",\n        \"urls\": {\n            \"callbackUrl\": \"{{callbackUrl}}\"\n        },\n        \"payeeInfo\": {\n            \"payeeId\": \"{{merchantId}}\",\n            \"payeeReference\": \"{{payeeReference}}\",\n            \"payeeName\": \"{{merchantName}}\",\n        }\n    }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/psp/paymentorders",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"psp",
+										"paymentorders"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Recur paymentOrder",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"paymentorder\": {\n        \"operation\": \"Recur\",\n        \"recurrenceToken\": \"fc1d77b5-dc4d-4aa5-bb8d-f692f124d513\",\n        \"currency\": \"SEK\",\n        \"amount\": 1001,\n        \"vatAmount\": 0,\n        \"description\": \"test description\",\n        \"userAgent\": \"Mozilla/5.0...\",\n        \"language\": \"sv-SE\",\n        \"urls\": {\n            \"callbackUrl\": \"https://en.wikipedia.org/wiki/callback\"\n        },\n        \"payeeInfo\": {\n            \"payeeId\": \"8d25bdc4-16db-4ee5-a975-7cde05a58ba5\",\n            \"payeeReference\": \"someUniqueReference1592902314\",\n            \"payeeName\": \"test merchant\"\n        }\n    }\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://api.externalintegration.payex.com/psp/paymentorders",
+											"protocol": "https",
+											"host": [
+												"api",
+												"externalintegration",
+												"payex",
+												"com"
+											],
+											"path": [
+												"psp",
+												"paymentorders"
+											]
+										}
+									},
+									"status": "Created",
+									"code": 201,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Length",
+											"value": "2286"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Location",
+											"value": "http://api.externalintegration.payex.com/psp/paymentorders/16b14a16-3a2a-47d2-40f5-08d816808590"
+										},
+										{
+											"key": "Server",
+											"value": "Microsoft-IIS/8.5"
+										},
+										{
+											"key": "X-Powered-By",
+											"value": "ASP.NET"
+										},
+										{
+											"key": "Date",
+											"value": "Tue, 23 Jun 2020 08:51:53 GMT"
+										},
+										{
+											"key": "Strict-Transport-Security",
+											"value": "max-age=16070400; includeSubDomains"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"paymentOrder\": {\n        \"id\": \"/psp/paymentorders/16b14a16-3a2a-47d2-40f5-08d816808590\",\n        \"created\": \"2020-06-23T08:51:53.6701203Z\",\n        \"updated\": \"2020-06-23T08:51:54.4017655Z\",\n        \"operation\": \"Recur\",\n        \"state\": \"Ready\",\n        \"currency\": \"SEK\",\n        \"amount\": 1001,\n        \"vatAmount\": 0,\n        \"remainingCaptureAmount\": 1001,\n        \"remainingCancellationAmount\": 1001,\n        \"description\": \"test description\",\n        \"initiatingSystemUserAgent\": \"Mozilla/5.0...\",\n        \"userAgent\": \"Mozilla/5.0...\",\n        \"language\": \"sv-SE\",\n        \"urls\": {\n            \"id\": \"/psp/paymentorders/16b14a16-3a2a-47d2-40f5-08d816808590/urls\"\n        },\n        \"payeeInfo\": {\n            \"id\": \"/psp/paymentorders/16b14a16-3a2a-47d2-40f5-08d816808590/payeeInfo\"\n        },\n        \"payments\": {\n            \"id\": \"/psp/paymentorders/16b14a16-3a2a-47d2-40f5-08d816808590/payments\"\n        },\n        \"currentPayment\": {\n            \"id\": \"/psp/paymentorders/16b14a16-3a2a-47d2-40f5-08d816808590/currentpayment\"\n        },\n        \"items\": [\n            {\n                \"creditCard\": {}\n            }\n        ]\n    },\n    \"operations\": [\n        {\n            \"method\": \"POST\",\n            \"href\": \"https://api.externalintegration.payex.com/psp/paymentorders/16b14a16-3a2a-47d2-40f5-08d816808590/cancellations\",\n            \"rel\": \"create-paymentorder-cancel\",\n            \"contentType\": \"application/json\"\n        },\n        {\n            \"method\": \"POST\",\n            \"href\": \"https://api.externalintegration.payex.com/psp/paymentorders/16b14a16-3a2a-47d2-40f5-08d816808590/captures\",\n            \"rel\": \"create-paymentorder-capture\",\n            \"contentType\": \"application/json\"\n        },\n        {\n            \"method\": \"PATCH\",\n            \"href\": \"https://api.externalintegration.payex.com/psp/paymentorders/16b14a16-3a2a-47d2-40f5-08d816808590\",\n            \"rel\": \"update-paymentorder-overchargedamount\",\n            \"contentType\": \"application/json\"\n        },\n        {\n            \"method\": \"POST\",\n            \"href\": \"https://api.externalintegration.payex.com/psp/creditcard/payments/0b56f58b-04d0-4461-d176-08d8167fd304/cancellations\",\n            \"rel\": \"create-cancellation\",\n            \"contentType\": \"application/json\"\n        },\n        {\n            \"method\": \"POST\",\n            \"href\": \"https://api.externalintegration.payex.com/psp/creditcard/payments/0b56f58b-04d0-4461-d176-08d8167fd304/captures\",\n            \"rel\": \"create-capture\",\n            \"contentType\": \"application/json\"\n        },\n        {\n            \"method\": \"PATCH\",\n            \"href\": \"https://api.externalintegration.payex.com/psp/creditcard/payments/0b56f58b-04d0-4461-d176-08d8167fd304/authorizations/8c1c9e5e-a00e-4161-aff4-08d8167ff8fe\",\n            \"rel\": \"update-authorization-overchargedamount\",\n            \"contentType\": \"application/json\"\n        },\n        {\n            \"method\": \"GET\",\n            \"href\": \"https://api.externalintegration.payex.com/psp/paymentorders/16b14a16-3a2a-47d2-40f5-08d816808590/paid\",\n            \"rel\": \"paid-paymentorder\",\n            \"contentType\": \"application/json\"\n        }\n    ]\n}"
+								}
+							]
 						}
 					]
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
-			"name": "Payment Pages",
+			"name": "Payments",
 			"item": [
 				{
 					"name": "Card",
@@ -1006,7 +1143,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "28b9ebe8-fa3a-47af-a1b1-a7366b3f2b74",
 										"exec": [
 											"responseCode = pm.response.code;\r",
 											"responseBody = pm.response.json();\r",
@@ -1121,7 +1257,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "13424431-2c9b-47a9-840c-7842faa48210",
 										"exec": [
 											"responseCode = pm.response.code;\r",
 											"responseBody = pm.response.json();\r",
@@ -1232,7 +1367,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "050930bd-66d9-4610-bfad-7da93e6c84c6",
 										"exec": [
 											"responseCode = pm.response.code;\r",
 											"responseBody = pm.response.json();\r",
@@ -1490,7 +1624,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "c56e3c9e-6cde-43c6-a8cb-6e8540601008",
 										"exec": [
 											"responseCode = pm.response.code;\r",
 											"responseBody = pm.response.json();\r",
@@ -1748,7 +1881,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "851fb01c-9860-45a3-95c4-50529aa0f00f",
 										"exec": [
 											"responseCode = pm.response.code;\r",
 											"responseBody = pm.response.json();\r",
@@ -2006,7 +2138,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "d2f167bf-d8dd-4d98-ba1d-277fe8f2a6cb",
 										"exec": [
 											"responseCode = pm.response.code;\r",
 											"responseBody = pm.response.json();\r",
@@ -2156,9 +2287,7 @@
 								}
 							]
 						}
-					],
-					"protocolProfileBehavior": {},
-					"_postman_isSubFolder": true
+					]
 				},
 				{
 					"name": "Credit Account",
@@ -2169,7 +2298,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "4cd5b77d-cf79-434e-941d-f1409176d17d",
 										"exec": [
 											"responseCode = pm.response.code;\r",
 											"responseBody = pm.response.json();\r",
@@ -2256,9 +2384,13 @@
 											}
 										},
 										"url": {
-											"raw": "{{baseUrl}}/psp/creditaccount/payments",
+											"raw": "https://api.externalintegration.payex.com/psp/creditaccount/payments",
+											"protocol": "https",
 											"host": [
-												"{{baseUrl}}"
+												"api",
+												"externalintegration",
+												"payex",
+												"com"
 											],
 											"path": [
 												"psp",
@@ -2311,7 +2443,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "3dd2c4da-9098-42cc-bb19-08c965c299f0",
 										"exec": [
 											"responseCode = pm.response.code;\r",
 											"responseBody = pm.response.json();\r",
@@ -2569,7 +2700,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "bdbfaf88-e95e-455b-b215-d3cfbdc9a07a",
 										"exec": [
 											"responseCode = pm.response.code;\r",
 											"responseBody = pm.response.json();\r",
@@ -2827,7 +2957,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "1ede1fa6-cc09-487d-86ab-c9618016e0f2",
 										"exec": [
 											"responseCode = pm.response.code;\r",
 											"responseBody = pm.response.json();\r",
@@ -3084,7 +3213,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "9bd91dc5-21e5-473e-946c-28d03a1bc91c",
 										"exec": [
 											"responseCode = pm.response.code;\r",
 											"responseBody = pm.response.json();\r",
@@ -3234,9 +3362,7 @@
 								}
 							]
 						}
-					],
-					"protocolProfileBehavior": {},
-					"_postman_isSubFolder": true
+					]
 				},
 				{
 					"name": "Invoice",
@@ -3247,7 +3373,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "f236c544-ba1f-4e69-935d-ef89a38c4873",
 										"exec": [
 											"responseCode = pm.response.code;\r",
 											"responseBody = pm.response.json();\r",
@@ -3395,7 +3520,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "07ec402a-55e0-4a45-98c1-8508f4769eb3",
 										"exec": [
 											"responseCode = pm.response.code;\r",
 											"responseBody = pm.response.json();\r",
@@ -3533,7 +3657,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "7479c3e2-b8b9-4dd0-92a7-74d9b3421d52",
 										"exec": [
 											"responseCode = pm.response.code;\r",
 											"responseBody = pm.response.json();\r",
@@ -3573,7 +3696,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"transaction\": {\n        \"activity\": \"FinancingConsumer\"\n    },\n    \"consumer\": {\n        \"socialSecurityNumber\": \"{{consumerSSN}}\",\n        \"customerNumber\": \"123456\",\n        \"email\": \"{{consumerEmail}}\",\n        \"msisdn\": \"{{msisdn}}\",\n        \"ip\": \"127.0.0.1\"\n    },\n    \"legalAddress\": {\n        \"addressee\": \"{{consumerName}}\",\n        \"streetAddress\": \"{{consumerAdress}}\",\n        \"zipCode\": \"{{consumerZipCode}}\",\n        \"city\": \"{{consumerCity}}\",\n        \"countryCode\": \"{{countryCode}}\"\n    }\n}",
+									"raw": "{\n    \"transaction\": {\n        \"activity\": \"FinancingConsumer\"\n    },\n    \"consumer\": {\n        \"socialSecurityNumber\": \"{{consumerSSN}}\",\n        \"customerNumber\": \"123456\",\n        \"email\": \"{{consumerEmail}}\",\n        \"msisdn\": \"{{msisdn}}\",\n        \"ip\": \"127.0.0.1\"\n    },\n    \"legalAddress\": {\n        \"addressee\": \"{{consumerName}}\",\n        \"streetAddress\": \"{{consumerAddress}}\",\n        \"zipCode\": \"{{consumerZipCode}}\",\n        \"city\": \"{{consumerCity}}\",\n        \"countryCode\": \"{{countryCode}}\"\n    }\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -3670,7 +3793,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "ec81c365-1fbb-4e7d-aacb-2da67759df59",
 										"exec": [
 											"responseCode = pm.response.code;\r",
 											"responseBody = pm.response.json();\r",
@@ -3928,7 +4050,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "9e774975-7cdd-47e4-ae10-9baa5be90369",
 										"exec": [
 											"responseCode = pm.response.code;\r",
 											"responseBody = pm.response.json();\r",
@@ -4186,7 +4307,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "e13e3e7b-06ce-4b87-a3a6-eef8b3d60a75",
 										"exec": [
 											"responseCode = pm.response.code;\r",
 											"responseBody = pm.response.json();\r",
@@ -4444,7 +4564,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "6b6d1a0d-1526-42a0-8fb6-b7222698db35",
 										"exec": [
 											"responseCode = pm.response.code;\r",
 											"responseBody = pm.response.json();\r",
@@ -4594,9 +4713,7 @@
 								}
 							]
 						}
-					],
-					"protocolProfileBehavior": {},
-					"_postman_isSubFolder": true
+					]
 				},
 				{
 					"name": "Mobile Pay",
@@ -4607,7 +4724,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "add638b4-8929-4d73-8533-6693edfd2bf7",
 										"exec": [
 											"responseCode = pm.response.code;\r",
 											"responseBody = pm.response.json();\r",
@@ -4694,9 +4810,13 @@
 											}
 										},
 										"url": {
-											"raw": "{{baseUrl}}/psp/mobilepay/payments",
+											"raw": "https://api.externalintegration.payex.com/psp/mobilepay/payments",
+											"protocol": "https",
 											"host": [
-												"{{baseUrl}}"
+												"api",
+												"externalintegration",
+												"payex",
+												"com"
 											],
 											"path": [
 												"psp",
@@ -4749,7 +4869,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "5cd64069-5e5d-4834-bc24-660e4fb71e49",
 										"exec": [
 											"responseCode = pm.response.code;\r",
 											"responseBody = pm.response.json();\r",
@@ -5007,7 +5126,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "9f8a2374-df2a-445a-ab44-147b5445a091",
 										"exec": [
 											"responseCode = pm.response.code;\r",
 											"responseBody = pm.response.json();\r",
@@ -5265,7 +5383,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "83d6152c-5d42-4368-a823-50ad662ecf4b",
 										"exec": [
 											"responseCode = pm.response.code;\r",
 											"responseBody = pm.response.json();\r",
@@ -5523,7 +5640,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "bcec80f6-32c7-4a43-a2ed-c43f65170358",
 										"exec": [
 											"responseCode = pm.response.code;\r",
 											"responseBody = pm.response.json();\r",
@@ -5673,9 +5789,7 @@
 								}
 							]
 						}
-					],
-					"protocolProfileBehavior": {},
-					"_postman_isSubFolder": true
+					]
 				},
 				{
 					"name": "Swish",
@@ -5686,7 +5800,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "d1abadd6-d3f2-4503-8871-f8a7c6d2c924",
 										"exec": [
 											"responseCode = pm.response.code;\r",
 											"responseBody = pm.response.json();\r",
@@ -5773,9 +5886,13 @@
 											}
 										},
 										"url": {
-											"raw": "{{baseUrl}}/psp/swish/payments",
+											"raw": "https://api.externalintegration.payex.com/psp/swish/payments",
+											"protocol": "https",
 											"host": [
-												"{{baseUrl}}"
+												"api",
+												"externalintegration",
+												"payex",
+												"com"
 											],
 											"path": [
 												"psp",
@@ -5828,22 +5945,14 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "72b88b5b-9a96-43d7-832d-0b13a9c3ab23",
 										"exec": [
 											"responseCode = pm.response.code;\r",
 											"responseBody = pm.response.json();\r",
 											"\r",
 											"if (responseCode >= 200 && responseCode < 300) {\r",
 											"    // Finding the values to set to globals\r",
-											"    const transactionId = responseBody.authorization.id;\r",
-											"    const authorization = responseBody.authorization;\r",
-											"    const paymentToken = authorization.paymentToken ? authorization.paymentToken : undefined;\r",
-											"    const recurrenceToken = authorization.paymentToken ? authorization.recurrenceToken : undefined;\r",
-											"    if(paymentToken)\r",
-											"        pm.environment.set(\"paymentToken\", paymentToken);\r",
-											"    if(recurrenceToken)\r",
-											"        pm.environment.set(\"recurrenceToken\", recurrenceToken);\r",
-											"    \r",
+											"    const sale = responseBody.sale;\r",
+											"    const transactionId = sale.id;\r",
 											"    pm.environment.set(\"transactionId\", transactionId);\r",
 											"}"
 										],
@@ -5908,9 +6017,20 @@
 											}
 										},
 										"url": {
-											"raw": "{{operationDirectPayment}}",
+											"raw": "https://api.externalintegration.payex.com/psp/swish/payments/1bb1ebb7-1cf1-43cc-8c76-08d7fcb702fe/sales",
+											"protocol": "https",
 											"host": [
-												"{{operationDirectPayment}}"
+												"api",
+												"externalintegration",
+												"payex",
+												"com"
+											],
+											"path": [
+												"psp",
+												"swish",
+												"payments",
+												"1bb1ebb7-1cf1-43cc-8c76-08d7fcb702fe",
+												"sales"
 											]
 										}
 									},
@@ -5958,7 +6078,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "d8a82fcb-33f1-4669-bc2b-3fab95748ab7",
 										"exec": [
 											"responseCode = pm.response.code;\r",
 											"responseBody = pm.response.json();\r",
@@ -6205,12 +6324,11 @@
 							]
 						},
 						{
-							"name": "Get payment (verify reversal and proceed)",
+							"name": "Get payment (verify reversal)",
 							"event": [
 								{
 									"listen": "test",
 									"script": {
-										"id": "e0b8585b-26a1-457d-a981-f9045e5520d2",
 										"exec": [
 											"responseCode = pm.response.code;\r",
 											"responseBody = pm.response.json();\r",
@@ -6354,9 +6472,7 @@
 								}
 							]
 						}
-					],
-					"protocolProfileBehavior": {},
-					"_postman_isSubFolder": true
+					]
 				},
 				{
 					"name": "Vipps",
@@ -6367,7 +6483,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "e472cef1-fa32-4a0d-b201-92aa36df9719",
 										"exec": [
 											"responseCode = pm.response.code;\r",
 											"responseBody = pm.response.json();\r",
@@ -6513,7 +6628,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "5b9f49d7-0022-4d77-b490-fc1c0ccaff9d",
 										"exec": [
 											"responseCode = pm.response.code;\r",
 											"responseBody = pm.response.json();\r",
@@ -6771,7 +6885,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "26d2b8a4-ca80-4ea3-925e-eae757d37db1",
 										"exec": [
 											"responseCode = pm.response.code;\r",
 											"responseBody = pm.response.json();\r",
@@ -7029,7 +7142,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "c35d0c32-6298-46ee-a4e9-234a478ddab1",
 										"exec": [
 											"responseCode = pm.response.code;\r",
 											"responseBody = pm.response.json();\r",
@@ -7287,7 +7399,6 @@
 								{
 									"listen": "test",
 									"script": {
-										"id": "e5ec37f0-98df-48a9-ba4b-7878751590c6",
 										"exec": [
 											"responseCode = pm.response.code;\r",
 											"responseBody = pm.response.json();\r",
@@ -7437,13 +7548,705 @@
 								}
 							]
 						}
-					],
-					"protocolProfileBehavior": {},
-					"_postman_isSubFolder": true
+					]
+				},
+				{
+					"name": "Trustly",
+					"item": [
+						{
+							"name": "Reverse payment",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{merchantToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{operationreversePayment}}",
+									"host": [
+										"{{operationreversePayment}}"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Reverse payment",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"transaction\": {\n        \"amount\": 10000,\n        \"vatAmount\": 0,\n        \"description\": \"your description\",\n        \"payeeReference\": \"someUniqueReference1591251231\"\n    }\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://api.externalintegration.payex.com/psp/trustly/payments/1c983539-82b9-461f-9322-08d807b36993/reversals",
+											"protocol": "https",
+											"host": [
+												"api",
+												"externalintegration",
+												"payex",
+												"com"
+											],
+											"path": [
+												"psp",
+												"trustly",
+												"payments",
+												"1c983539-82b9-461f-9322-08d807b36993",
+												"reversals"
+											]
+										}
+									},
+									"status": "Created",
+									"code": 201,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Location",
+											"value": "https://api.externalintegration.payex.com/psp/trustly/payments/1c983539-82b9-461f-9322-08d807b36993/reversals/c7c345d4-a9e3-4f90-3ceb-08d8084e3c65"
+										},
+										{
+											"key": "Server",
+											"value": "Microsoft-IIS/8.5"
+										},
+										{
+											"key": "X-Powered-By",
+											"value": "ASP.NET"
+										},
+										{
+											"key": "Date",
+											"value": "Thu, 04 Jun 2020 06:13:52 GMT"
+										},
+										{
+											"key": "Content-Length",
+											"value": "650"
+										},
+										{
+											"key": "Strict-Transport-Security",
+											"value": "max-age=16070400; includeSubDomains"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"payment\": \"/psp/trustly/payments/1c983539-82b9-461f-9322-08d807b36993\",\n    \"reversal\": {\n        \"id\": \"/psp/trustly/payments/1c983539-82b9-461f-9322-08d807b36993/reversals/c7c345d4-a9e3-4f90-3ceb-08d8084e3c65\",\n        \"transaction\": {\n            \"id\": \"/psp/trustly/payments/1c983539-82b9-461f-9322-08d807b36993/transactions/c7c345d4-a9e3-4f90-3ceb-08d8084e3c65\",\n            \"created\": \"2020-06-04T06:13:52.1814712Z\",\n            \"updated\": \"2020-06-04T06:13:53.0088551Z\",\n            \"type\": \"Reversal\",\n            \"state\": \"Completed\",\n            \"number\": 49100000142,\n            \"amount\": 10000,\n            \"vatAmount\": 0,\n            \"description\": \"your description\",\n            \"payeeReference\": \"someUniqueReference1591251231\",\n            \"isOperational\": false,\n            \"reconciliationNumber\": 737579,\n            \"operations\": []\n        }\n    }\n}"
+								}
+							]
+						},
+						{
+							"name": "create payment",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"responseCode = pm.response.code;\r",
+											"responseBody = pm.response.json();\r",
+											"\r",
+											"if (responseCode >= 200 && responseCode < 300) {\r",
+											"    // Finding the values to set to globals\r",
+											"    const paymentId = responseBody.payment.id;\r",
+											"    const operations = responseBody.operations;\r",
+											"    const directPayment = operations.find(operations => operations.rel ===\"create-sale\");\r",
+											"    const redirectPayment = operations.find(operations => operations.rel.startsWith(\"redirect-\"));\r",
+											"    const seamlessPayment = operations.find(operations => operations.rel === \"view-sales\");\r",
+											"    const abortPayment = operations.find(operations => operations.rel.includes(\"abort\"));\r",
+											"    // Use data to populate immediately relevant data to continue flow.\r",
+											"    pm.environment.set(\"paymentId\", paymentId);\r",
+											"    pm.globals.set(\"operationDirectPayment\", directPayment ? directPayment.href : \"N/A\"); // These will only be set if the operation is found\r",
+											"    pm.globals.set(\"operationRedirectPayment\", redirectPayment ? redirectPayment.href : \"N/A\"); // This is to avoid using data of wrong payment\r",
+											"    pm.globals.set(\"operationSeamlessPayment\", seamlessPayment ? seamlessPayment.href : \"N/A\"); // Furthermore you will get an error \r",
+											"    pm.globals.set(\"operationAbortPayment\", abortPayment ? abortPayment.href : \"N/A\"); // when trying to use N/A data.\r",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{merchantToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "",
+										"value": "",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"payment\": {\n        \"operation\": \"Purchase\",\n        \"intent\": \"Sale\",\n        \"currency\": \"SEK\",\n        \"prices\": [\n            {\n                \"type\": \"Trustly\",\n                \"amount\": 10000,\n                \"vatAmount\": 0\n            }\n        ],\n        \"description\": \"{{description}}\",\n        \"payerReference\": \"AB1234\",\n        \"userAgent\": \"Mozilla/5.0 Postman\",\n        \"language\": \"{{language}}\",\n        \"urls\": {\n        \t\"hostUrls\": [\n        \t\t\"{{hostUrl}}\"\n    \t\t],\n            \"completeUrl\": \"{{completeUrl}}\",\n            \"cancelUrl\": \"{{cancelUrl}}\",\n            \"callbackUrl\": \"{{callbackUrl}}\",\n            \"termsOfServiceUrl\": \"{{ToSUrl}}\",\n            \"logoUrl\": \"{{logoUrl}}\"\n        },\n        \"payeeInfo\": {\n            \"payeeId\": \"{{merchantId}}\",\n            \"payeeReference\": \"{{payeeReference}}\",\n            \"payeeName\": \"{{merchantName}}\"\n        }\n    }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/psp/trustly/payments",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"psp",
+										"trustly",
+										"payments"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "create payment",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "",
+												"value": "",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"payment\": {\n        \"operation\": \"Purchase\",\n        \"intent\": \"Sale\",\n        \"currency\": \"SEK\",\n        \"prices\": [\n            {\n                \"type\": \"Trustly\",\n                \"amount\": 10000,\n                \"vatAmount\": 0\n            }\n        ],\n        \"description\": \"test description\",\n        \"payerReference\": \"AB1234\",\n        \"userAgent\": \"Mozilla/5.0 Postman\",\n        \"language\": \"sv-SE\",\n        \"urls\": {\n        \t\"hostUrls\": [\n        \t\t\"https://en.wikipedia.org/wiki/Host\"\n    \t\t],\n            \"completeUrl\": \"https://en.wikipedia.org/wiki/Complete\",\n            \"cancelUrl\": \"https://en.wikipedia.org/wiki/Cancel\",\n            \"callbackUrl\": \"https://en.wikipedia.org/wiki/Callbback\",\n            \"termsOfServiceUrl\": \"https://en.wikipedia.org/wiki/Terms_Of_Service\",\n            \"logoUrl\": \"https://design.swedbankpay.com/v/4.5.0/img/swedbankpay-logo.svg\"\n        },\n        \"payeeInfo\": {\n            \"payeeId\": \"734310b0-f9b5-48ea-b730-b3628d907f0c\",\n            \"payeeReference\": \"someUniquereference123897\",\n            \"payeeName\": \"test merchant\"\n        }\n    }\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://api.externalintegration.payex.com/psp/trustly/payments",
+											"protocol": "https",
+											"host": [
+												"api",
+												"externalintegration",
+												"payex",
+												"com"
+											],
+											"path": [
+												"psp",
+												"trustly",
+												"payments"
+											]
+										}
+									},
+									"status": "Created",
+									"code": 201,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Location",
+											"value": "https://api.stage.payex.com/psp/trustly/payments/15016e9d-c741-47a5-a24a-08d8082bd0c0"
+										},
+										{
+											"key": "Server",
+											"value": "Microsoft-IIS/8.5"
+										},
+										{
+											"key": "X-Powered-By",
+											"value": "ASP.NET"
+										},
+										{
+											"key": "Date",
+											"value": "Thu, 04 Jun 2020 05:45:09 GMT"
+										},
+										{
+											"key": "Content-Length",
+											"value": "1504"
+										},
+										{
+											"key": "Strict-Transport-Security",
+											"value": "max-age=16070400; includeSubDomains"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"payment\": {\n        \"id\": \"/psp/trustly/payments/15016e9d-c741-47a5-a24a-08d8082bd0c0\",\n        \"number\": 79100021349,\n        \"created\": \"2020-06-04T05:45:09.4697173Z\",\n        \"updated\": \"2020-06-04T05:45:09.8015639Z\",\n        \"instrument\": \"Trustly\",\n        \"operation\": \"Purchase\",\n        \"intent\": \"Sale\",\n        \"state\": \"Ready\",\n        \"currency\": \"SEK\",\n        \"prices\": {\n            \"id\": \"/psp/trustly/payments/15016e9d-c741-47a5-a24a-08d8082bd0c0/prices\"\n        },\n        \"amount\": 0,\n        \"description\": \"test description\",\n        \"payerReference\": \"AB1234\",\n        \"initiatingSystemUserAgent\": \"PostmanRuntime/7.25.0\",\n        \"userAgent\": \"Mozilla/5.0 Postman\",\n        \"language\": \"sv-SE\",\n        \"urls\": {\n            \"id\": \"/psp/trustly/payments/15016e9d-c741-47a5-a24a-08d8082bd0c0/urls\"\n        },\n        \"payeeInfo\": {\n            \"id\": \"/psp/trustly/payments/15016e9d-c741-47a5-a24a-08d8082bd0c0/payeeinfo\"\n        },\n        \"metadata\": {\n            \"id\": \"/psp/trustly/payments/15016e9d-c741-47a5-a24a-08d8082bd0c0/metadata\"\n        }\n    },\n    \"operations\": [\n        {\n            \"method\": \"PATCH\",\n            \"href\": \"https://api.externalintegration.payex.com/psp/trustly/payments/15016e9d-c741-47a5-a24a-08d8082bd0c0\",\n            \"rel\": \"update-payment-abort\"\n        },\n        {\n            \"method\": \"POST\",\n            \"href\": \"https://api.externalintegration.payex.com/psp/trustly/payments/15016e9d-c741-47a5-a24a-08d8082bd0c0/sales\",\n            \"rel\": \"create-sale\"\n        },\n        {\n            \"method\": \"GET\",\n            \"href\": \"https://ecom.externalintegration.payex.com/trustly/payments/sales/2d65f35201ef89465f8b0513390f9c4deb235365885ab186f329e9385632b006\",\n            \"rel\": \"redirect-sale\"\n        },\n        {\n            \"method\": \"GET\",\n            \"href\": \"https://ecom.externalintegration.payex.com/trustly/core/scripts/client/px.trustly.client.js?token=2d65f35201ef89465f8b0513390f9c4deb235365885ab186f329e9385632b006&operation=sale\",\n            \"rel\": \"view-sales\",\n            \"contentType\": \"application/javascript\"\n        }\n    ]\n}"
+								}
+							]
+						},
+						{
+							"name": "accomplish sale",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"responseCode = pm.response.code;\r",
+											"responseBody = pm.response.json();\r",
+											"\r",
+											"if (responseCode >= 200 && responseCode < 300) {\r",
+											"    // Finding the values to set to globals\r",
+											"    const sale = responseBody.sale;\r",
+											"    const transactionId = sale.id;\r",
+											"    \r",
+											"    pm.environment.set(\"transactionId\", transactionId);\r",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{merchantToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "",
+										"value": "",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"transaction\": {\n    \t\"firstName\": \"{{consumerFirstName}}\",\n    \t\"lastName\": \"{{}}\"\n    }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{operationDirectPayment}}",
+									"host": [
+										"{{operationDirectPayment}}"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "accomplish sale",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "",
+												"value": "",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"transaction\": {\n    \t\"firstName\": \"Azra\",\n    \t\"lastName\": \"Oliveira\"\n    }\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://api.externalintegration.payex.com/psp/trustly/payments/b2c8a513-b581-4ec1-a24c-08d8082bd0c0/sales",
+											"protocol": "https",
+											"host": [
+												"api",
+												"externalintegration",
+												"payex",
+												"com"
+											],
+											"path": [
+												"psp",
+												"trustly",
+												"payments",
+												"b2c8a513-b581-4ec1-a24c-08d8082bd0c0",
+												"sales"
+											]
+										}
+									},
+									"status": "Created",
+									"code": 201,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Location",
+											"value": "https://api.stage.payex.com/psp/trustly/payments/b2c8a513-b581-4ec1-a24c-08d8082bd0c0/sales/332daa81-f5b9-4249-2b51-08d8082bd132"
+										},
+										{
+											"key": "Server",
+											"value": "Microsoft-IIS/8.5"
+										},
+										{
+											"key": "X-Powered-By",
+											"value": "ASP.NET"
+										},
+										{
+											"key": "Date",
+											"value": "Thu, 04 Jun 2020 05:50:42 GMT"
+										},
+										{
+											"key": "Content-Length",
+											"value": "812"
+										},
+										{
+											"key": "Strict-Transport-Security",
+											"value": "max-age=16070400; includeSubDomains"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"payment\": \"/psp/trustly/payments/b2c8a513-b581-4ec1-a24c-08d8082bd0c0\",\n    \"sale\": {\n        \"id\": \"/psp/trustly/payments/b2c8a513-b581-4ec1-a24c-08d8082bd0c0/sales/332daa81-f5b9-4249-2b51-08d8082bd132\",\n        \"transaction\": {\n            \"id\": \"/psp/trustly/payments/b2c8a513-b581-4ec1-a24c-08d8082bd0c0/transactions/332daa81-f5b9-4249-2b51-08d8082bd132\",\n            \"created\": \"2020-06-04T05:50:42.1690877Z\",\n            \"updated\": \"2020-06-04T05:50:42.7268213Z\",\n            \"type\": \"Sale\",\n            \"state\": \"AwaitingActivity\",\n            \"number\": 79100021354,\n            \"amount\": 10000,\n            \"vatAmount\": 0,\n            \"description\": \"test description\",\n            \"payeeReference\": \"someUniqueReference1591249839\",\n            \"isOperational\": true,\n            \"operations\": [\n                {\n                    \"method\": \"GET\",\n                    \"href\": \"https://test.trustly.com/_/orderclient.php?SessionID=6b66a08b-c94d-4298-bb02-079bd64b0ea7&OrderID=2205679201&Locale=sv_SE\",\n                    \"rel\": \"redirect-trustly\",\n                    \"contentType\": \"text/html\"\n                }\n            ]\n        }\n    }\n}"
+								}
+							]
+						},
+						{
+							"name": "Get payment (verify sale OK and proceed)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"responseCode = pm.response.code;\r",
+											"responseBody = pm.response.json();\r",
+											"\r",
+											"if (responseCode >= 200 && responseCode < 300) {\r",
+											"    const operations = responseBody.operations;\r",
+											"    const directPayment = operations.find(operations => operations.rel.startsWith(\"direct-\"));\r",
+											"    const redirectPayment = operations.find(operations => operations.rel.startsWith(\"redirect-\"));\r",
+											"    const seamlessPayment = operations.find(operations => operations.rel === \"view-payment\");\r",
+											"    const abortPayment = operations.find(operations => operations.rel.includes(\"abort\"));\r",
+											"    const capturePayment = operations.find(operations => operations.rel === \"create-capture\");\r",
+											"    const cancelPayment = operations.find(operations => operations.rel === \"create-cancellation\");\r",
+											"    const reversePayment = operations.find(operations => operations.rel === \"create-reversal\");\r",
+											"    const paidPayment = operations.find(operations => operations.rel === \"paid-payment\");\r",
+											"    // Use data to populate immediately relevant data to continue flow.\r",
+											"    if (!paidPayment) {\r",
+											"        pm.globals.set(\"operationDirectPayment\", directPayment ? directPayment.href : \"N/A\");       // These will only be set if the operation is found\r",
+											"        pm.globals.set(\"operationRedirectPayment\", redirectPayment ? redirectPayment.href : \"N/A\"); // This is to avoid using data of wrong payment\r",
+											"        pm.globals.set(\"operationSeamlessPayment\", seamlessPayment ? seamlessPayment.href : \"N/A\"); // Furthermore you will get an error \r",
+											"        pm.globals.set(\"operationAbortPayment\", abortPayment ? abortPayment.href : \"N/A\");          // when trying to use N/A data.\r",
+											"    }\r",
+											"    else\r",
+											"        pm.globals.set(\"operationPaidPayment\", paidPayment.href);                                        // this one has already been confirmed exists when setting it here.\r",
+											"\r",
+											"    pm.globals.set(\"operationcapturePayment\", capturePayment ? capturePayment.href : \"N/A\");\r",
+											"    pm.globals.set(\"operationcancelPayment\", cancelPayment ? cancelPayment.href : \"N/A\");\r",
+											"    pm.globals.set(\"operationreversePayment\", reversePayment ? reversePayment.href : \"N/A\");\r",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{merchantToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "",
+										"type": "text",
+										"value": ""
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}{{paymentId}}?$expand=sales",
+									"host": [
+										"{{baseUrl}}{{paymentId}}"
+									],
+									"query": [
+										{
+											"key": "$expand",
+											"value": "sales"
+										}
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Get successful payment",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "",
+												"value": "",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://api.externalintegration.payex.com/psp/trustly/payments/a086f5ae-a6a5-440a-a24b-08d8082bd0c0",
+											"protocol": "https",
+											"host": [
+												"api",
+												"externalintegration",
+												"payex",
+												"com"
+											],
+											"path": [
+												"psp",
+												"trustly",
+												"payments",
+												"a086f5ae-a6a5-440a-a24b-08d8082bd0c0"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Server",
+											"value": "Microsoft-IIS/8.5"
+										},
+										{
+											"key": "X-Powered-By",
+											"value": "ASP.NET"
+										},
+										{
+											"key": "Date",
+											"value": "Thu, 04 Jun 2020 05:49:35 GMT"
+										},
+										{
+											"key": "Content-Length",
+											"value": "1308"
+										},
+										{
+											"key": "Strict-Transport-Security",
+											"value": "max-age=16070400; includeSubDomains"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"payment\": {\n        \"id\": \"/psp/trustly/payments/a086f5ae-a6a5-440a-a24b-08d8082bd0c0\",\n        \"number\": 79100021351,\n        \"created\": \"2020-06-04T05:48:53.1212935Z\",\n        \"updated\": \"2020-06-04T05:49:25.9179939Z\",\n        \"instrument\": \"Trustly\",\n        \"operation\": \"Purchase\",\n        \"intent\": \"Sale\",\n        \"state\": \"Ready\",\n        \"currency\": \"SEK\",\n        \"prices\": {\n            \"id\": \"/psp/trustly/payments/a086f5ae-a6a5-440a-a24b-08d8082bd0c0/prices\"\n        },\n        \"amount\": 10000,\n        \"remainingReversalAmount\": 10000,\n        \"description\": \"test description\",\n        \"payerReference\": \"AB1234\",\n        \"initiatingSystemUserAgent\": \"PostmanRuntime/7.25.0\",\n        \"userAgent\": \"Mozilla/5.0 Postman\",\n        \"language\": \"sv-SE\",\n        \"transactions\": {\n            \"id\": \"/psp/trustly/payments/a086f5ae-a6a5-440a-a24b-08d8082bd0c0/transactions\"\n        },\n        \"sales\": {\n            \"id\": \"/psp/trustly/payments/a086f5ae-a6a5-440a-a24b-08d8082bd0c0/sales\"\n        },\n        \"urls\": {\n            \"id\": \"/psp/trustly/payments/a086f5ae-a6a5-440a-a24b-08d8082bd0c0/urls\"\n        },\n        \"payeeInfo\": {\n            \"id\": \"/psp/trustly/payments/a086f5ae-a6a5-440a-a24b-08d8082bd0c0/payeeinfo\"\n        },\n        \"metadata\": {\n            \"id\": \"/psp/trustly/payments/a086f5ae-a6a5-440a-a24b-08d8082bd0c0/metadata\"\n        }\n    },\n    \"operations\": [\n        {\n            \"method\": \"POST\",\n            \"href\": \"https://api.externalintegration.payex.com/psp/trustly/payments/a086f5ae-a6a5-440a-a24b-08d8082bd0c0/reversals\",\n            \"rel\": \"create-reversal\"\n        },\n        {\n            \"method\": \"GET\",\n            \"href\": \"https://api.externalintegration.payex.com/psp/trustly/payments/a086f5ae-a6a5-440a-a24b-08d8082bd0c0/paid\",\n            \"rel\": \"paid-payment\"\n        }\n    ]\n}"
+								}
+							]
+						},
+						{
+							"name": "Get payment (verify reversalOK)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"responseCode = pm.response.code;\r",
+											"responseBody = pm.response.json();\r",
+											"\r",
+											"if (responseCode >= 200 && responseCode < 300) {\r",
+											"    const operations = responseBody.operations;\r",
+											"    const directPayment = operations.find(operations => operations.rel.startsWith(\"direct-\"));\r",
+											"    const redirectPayment = operations.find(operations => operations.rel.startsWith(\"redirect-\"));\r",
+											"    const seamlessPayment = operations.find(operations => operations.rel === \"view-payment\");\r",
+											"    const abortPayment = operations.find(operations => operations.rel.includes(\"abort\"));\r",
+											"    const capturePayment = operations.find(operations => operations.rel === \"create-capture\");\r",
+											"    const cancelPayment = operations.find(operations => operations.rel === \"create-cancellation\");\r",
+											"    const reversePayment = operations.find(operations => operations.rel === \"create-reversal\");\r",
+											"    const paidPayment = operations.find(operations => operations.rel === \"paid-payment\");\r",
+											"    // Use data to populate immediately relevant data to continue flow.\r",
+											"    if (!paidPayment) {\r",
+											"        pm.globals.set(\"operationDirectPayment\", directPayment ? directPayment.href : \"N/A\");       // These will only be set if the operation is found\r",
+											"        pm.globals.set(\"operationRedirectPayment\", redirectPayment ? redirectPayment.href : \"N/A\"); // This is to avoid using data of wrong payment\r",
+											"        pm.globals.set(\"operationSeamlessPayment\", seamlessPayment ? seamlessPayment.href : \"N/A\"); // Furthermore you will get an error \r",
+											"        pm.globals.set(\"operationAbortPayment\", abortPayment ? abortPayment.href : \"N/A\");          // when trying to use N/A data.\r",
+											"    }\r",
+											"    else\r",
+											"        pm.globals.set(\"operationPaidPayment\", paidPayment.href);                                        // this one has already been confirmed exists when setting it here.\r",
+											"\r",
+											"    pm.globals.set(\"operationcapturePayment\", capturePayment ? capturePayment.href : \"N/A\");\r",
+											"    pm.globals.set(\"operationcancelPayment\", cancelPayment ? cancelPayment.href : \"N/A\");\r",
+											"    pm.globals.set(\"operationreversePayment\", reversePayment ? reversePayment.href : \"N/A\");\r",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{merchantToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "",
+										"type": "text",
+										"value": ""
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}{{paymentId}}?$expand=reversals",
+									"host": [
+										"{{baseUrl}}{{paymentId}}"
+									],
+									"query": [
+										{
+											"key": "$expand",
+											"value": "reversals"
+										}
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Get successful payment",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "",
+												"value": "",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://api.externalintegration.payex.com/psp/trustly/payments/a086f5ae-a6a5-440a-a24b-08d8082bd0c0",
+											"protocol": "https",
+											"host": [
+												"api",
+												"externalintegration",
+												"payex",
+												"com"
+											],
+											"path": [
+												"psp",
+												"trustly",
+												"payments",
+												"a086f5ae-a6a5-440a-a24b-08d8082bd0c0"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Server",
+											"value": "Microsoft-IIS/8.5"
+										},
+										{
+											"key": "X-Powered-By",
+											"value": "ASP.NET"
+										},
+										{
+											"key": "Date",
+											"value": "Thu, 04 Jun 2020 05:49:35 GMT"
+										},
+										{
+											"key": "Content-Length",
+											"value": "1308"
+										},
+										{
+											"key": "Strict-Transport-Security",
+											"value": "max-age=16070400; includeSubDomains"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"payment\": {\n        \"id\": \"/psp/trustly/payments/a086f5ae-a6a5-440a-a24b-08d8082bd0c0\",\n        \"number\": 79100021351,\n        \"created\": \"2020-06-04T05:48:53.1212935Z\",\n        \"updated\": \"2020-06-04T05:49:25.9179939Z\",\n        \"instrument\": \"Trustly\",\n        \"operation\": \"Purchase\",\n        \"intent\": \"Sale\",\n        \"state\": \"Ready\",\n        \"currency\": \"SEK\",\n        \"prices\": {\n            \"id\": \"/psp/trustly/payments/a086f5ae-a6a5-440a-a24b-08d8082bd0c0/prices\"\n        },\n        \"amount\": 10000,\n        \"remainingReversalAmount\": 10000,\n        \"description\": \"test description\",\n        \"payerReference\": \"AB1234\",\n        \"initiatingSystemUserAgent\": \"PostmanRuntime/7.25.0\",\n        \"userAgent\": \"Mozilla/5.0 Postman\",\n        \"language\": \"sv-SE\",\n        \"transactions\": {\n            \"id\": \"/psp/trustly/payments/a086f5ae-a6a5-440a-a24b-08d8082bd0c0/transactions\"\n        },\n        \"sales\": {\n            \"id\": \"/psp/trustly/payments/a086f5ae-a6a5-440a-a24b-08d8082bd0c0/sales\"\n        },\n        \"urls\": {\n            \"id\": \"/psp/trustly/payments/a086f5ae-a6a5-440a-a24b-08d8082bd0c0/urls\"\n        },\n        \"payeeInfo\": {\n            \"id\": \"/psp/trustly/payments/a086f5ae-a6a5-440a-a24b-08d8082bd0c0/payeeinfo\"\n        },\n        \"metadata\": {\n            \"id\": \"/psp/trustly/payments/a086f5ae-a6a5-440a-a24b-08d8082bd0c0/metadata\"\n        }\n    },\n    \"operations\": [\n        {\n            \"method\": \"POST\",\n            \"href\": \"https://api.externalintegration.payex.com/psp/trustly/payments/a086f5ae-a6a5-440a-a24b-08d8082bd0c0/reversals\",\n            \"rel\": \"create-reversal\"\n        },\n        {\n            \"method\": \"GET\",\n            \"href\": \"https://api.externalintegration.payex.com/psp/trustly/payments/a086f5ae-a6a5-440a-a24b-08d8082bd0c0/paid\",\n            \"rel\": \"paid-payment\"\n        }\n    ]\n}"
+								}
+							]
+						}
+					]
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		}
-	],
-	"protocolProfileBehavior": {}
+	]
 }
